@@ -3,8 +3,8 @@
 # Bitmap Display Configuration: 
 # - Unit width in pixels: 8           
 # - Unit height in pixels: 8 
-# - Display width in pixels: 256 
-# - Display height in pixels: 256 
+# - Display width in pixels: 512 
+# - Display height in pixels: 512 
 # - Base Address for Display: 0x10008000 ($gp) 
 # 
 .eqv  	BASE_ADDRESS	0x10008000 
@@ -54,10 +54,24 @@ next_level:
  	li $s4, 0 # enemy 1
  	li $s5, 0 # enemy 2
  	li $s6, 0 # spike 3
- 	
+
+# ground function
 ground:	la $a1, COLOR_GROUND
 	la $a0, GROUND
  	j paint_ground
+paint_ground:
+	# $a0: position
+	# $a1: colour
+	add $a0, $t0, $a0 # a0 = base + coordinate
+    	li $t7, 0
+loop_ground:
+	bge $t7, 32, spike
+	li $t5, 4 	  # 4 bytes
+	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	add $t5, $t5, $a0 # t5 = address + offset
+	sw $a1, ($t5)
+    	addi $t7, $t7, 1
+    	j loop_ground
  
 # spike function
 spike:	la $a1, COLOR_SPIKE
@@ -80,6 +94,14 @@ spike_lvl_3:
 	j paint_spike
 	la $a0, SPIKE_3_2
 	j paint_spike
+paint_spike:
+	# $a0: position
+	# $a1: colour
+	add $a0, $t0, $a0 # a0 = base + coordinate
+	sw $a1, 4($a0)
+	sw $a1, 128($a0)
+	sw $a1, 132($a0)
+	j platform
 	
 # platform function
 platform: 
@@ -101,6 +123,19 @@ platform_lvl_3:
 	j paint_platform
 	la $a0, PLATFORM_3_2
 	j paint_platform
+paint_platform:
+	# $a0: position
+	# $a1: colour
+	add $a0, $t0, $a0 # a0 = base + coordinate
+    	li $t7, 0 # init t7 = 0
+loop_platform:
+	bge $t7, 9, monster
+	li $t5, 4 	  # 4 bytes
+	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	add $t5, $t5, $a0 # t5 = address + offset
+	sw $a1, ($t5)
+    	addi $t7, $t7, 1
+    	j loop_platform
 
 # monster function
 monster:la $a1, COLOR_MONSTER
@@ -120,6 +155,15 @@ monster_lvl_3:
 	j paint_monster
 	la $a0, MONSTER_3_3
 	j paint_monster
+paint_monster:
+	# $a0: position
+	# $a1: colour
+	add $a0, $t0, $a0 # a0 = base + coordinate
+	sw $a1, ($a0)
+	sw $a1, 4($a0)
+	sw $a1, 128($a0)
+	sw $a1, 132($a0)
+	j finish
 
 # finish line function
 finish:	la $a1, COLOR_FINISH
@@ -134,6 +178,13 @@ finish_lvl_2:
 finish_lvl_3:
 	la $a0, FINISH_3
 	j paint_finish
+paint_finish:
+	# $a0: position
+	# $a1: colour
+	add $a0, $t0, $a0 # a0 = base + coordinate
+	sw $a1, ($a0)
+	sw $a1, 4($a0)
+	j player
 	
 # player function	
 player:
@@ -191,7 +242,6 @@ respond_to_3:
 	li $s7, 3
 	j remove_player
 
-	
 remove_player:
 	li $t7, 32 	  #t7 = 32
 	mul $t7, $t7, $s2 #t7 = 32*y
@@ -216,7 +266,7 @@ remove_player:
 	beq $t8, 0x33, next_level   # ASCII code of '33' is 0x64
 
 paint_player:
-	li $t7, 32 #t7 = 64
+	li $t7, 32 	  #t7 = 64
 	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
 	add $t7, $s1, $t7 #t7 = x + 64*y
 	add $t7, $t7, $t0
@@ -231,62 +281,7 @@ paint_player:
 	li $t6, 0xf1C27D
 	sw $t6, 128($t7)
 	sw $t6, 132($t7)
-	j wait
-	
-paint_ground:
-	add $a0, $t0, $a0 # a0 = base + coordinate
-    	li $t7, 0
-loop_ground:
-	bge $t7, 32, spike
-	li $t5, 4 # 4 bytes
-	mul $t5, $t5, $t7 #offset = 4 bytes * index
-	
-	add $t5, $t5, $a0 # t5 = address + offset
-	sw $a1, ($t5)
-    	addi $t7, $t7, 1
-    	j loop_ground	
-    	
-paint_spike:
-	# $a0: position
-	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
-	sw $a1, 4($a0)
-	sw $a1, 128($a0)
-	sw $a1, 132($a0)
-	j platform
-	
-paint_platform:
-	# $a0: position
-	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
-    	li $t7, 0 # init t7 = 0
-loop_platform:
-	bge $t7, 9, monster
-	li $t5, 4 # 4 bytes
-	mul $t5, $t5, $t7 #offset = 4 bytes * index
-	
-	add $t5, $t5, $a0 # t5 = address + offset
-	sw $a1, ($t5)
-    	addi $t7, $t7, 1
-    	j loop_platform
-	
-paint_monster:
-	# $a0: position
-	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
-	sw $a1, ($a0)
-	sw $a1, 4($a0)
-	sw $a1, 128($a0)
-	sw $a1, 132($a0)
-	j finish
-
-paint_finish:
-	# $a0: position
-	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
-	sw $a1, ($a0)
-	sw $a1, 4($a0)
-	j player
+	j wait	
 	
 Exit:
  	li $v0, 10 # terminate the program gracefully 
