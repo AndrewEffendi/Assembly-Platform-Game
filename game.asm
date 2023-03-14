@@ -446,7 +446,8 @@ end_r_p_3:
 	
 #p
 respond_to_p:
-	j Exit
+	li $t8, 0x31 
+	j respond_to_1
 
 Exit:
  	li $v0, 10 # terminate the program gracefully 
