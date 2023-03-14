@@ -59,6 +59,7 @@ reset:	li $s0, 5 # health
 	li $s7, 3 # level
 
 next_level:
+	
  	li $s1, 0 # player's x-coordinate
  	li $s2, 212 # player's y-coordinate
  	
@@ -131,9 +132,13 @@ paint_spike:
 	j platform
 	
 # platform function
+remove_platform:
+	la $a1, COLOR_BLACK
+	j p_skip
 platform: 
+	li $a3,0
 	la $a1, COLOR_PLATFORM
-	beq $s7, 2, platform_lvl_2
+p_skip:	beq $s7, 2, platform_lvl_2
 	beq $s7, 3, platform_lvl_3
 platform_lvl_1:
 	li $a2, 12
@@ -169,6 +174,7 @@ paint_platform:
 	# $a0: position
 	# $a1: colour
 	# $a2: next label
+	# $a3 remove calling level
 	add $a0, $t0, $a0 # a0 = base + coordinate
     	li $t7, 0 # init t7 = 0
 loop_platform:
@@ -186,7 +192,11 @@ end_loop_p:
 	beq $a2, 33, p_3_3
 	beq $a2, 34, p_3_4
 	beq $a2, 35, p_3_5
+	beq $a3, 1, end_r_p_1
+	beq $a3, 2, end_r_p_2
+	beq $a3, 3, end_r_p_3
 	j monster
+	
 
 # monster function
 monster:la $a1, COLOR_MONSTER
@@ -394,12 +404,23 @@ right: 	addi $s1, $s1, 8 # x+4
 	j paint_player
 	
 respond_to_1:
+	li $a3, 1
+	j remove_platform
+end_r_p_1:
 	li $s7, 1
 	j remove_player
+	
 respond_to_2:
+	li $a3, 2
+	j remove_platform
+end_r_p_2:
 	li $s7, 2
 	j remove_player
+	
 respond_to_3:
+	li $a3, 3
+	j remove_platform
+end_r_p_3:
 	li $s7, 3
 	j remove_player	
 	
