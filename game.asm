@@ -88,8 +88,12 @@ loop_ground:
     	j loop_ground
  
 # spike function
-spike:	la $a1, COLOR_SPIKE
-	beq $s7, 2, spike_lvl_2
+spike:	li $a3,0
+	la $a1, COLOR_SPIKE
+	j s_skip
+remove_spike:
+	la $a1, COLOR_BLACK
+s_skip: beq $s7, 2, spike_lvl_2
 	beq $s7, 3, spike_lvl_3
 spike_lvl_1:
 	li $a2, 12 
@@ -119,6 +123,7 @@ paint_spike:
 	# $a0: position
 	# $a1: colour
 	# $a2: next label
+	# $a3 remove calling level
 	add $a0, $t0, $a0 # a0 = base + coordinate
 	sw $a1, 4($a0)
 	sw $a1, 260($a0)
@@ -129,15 +134,16 @@ paint_spike:
 	beq $a2, 13, s_1_3
 	beq $a2, 22, s_2_2
 	beq $a2, 32, s_3_2
+	bnez $a3, remove_platform
 	j platform
 	
 # platform function
-remove_platform:
-	la $a1, COLOR_BLACK
-	j p_skip
 platform: 
 	li $a3,0
 	la $a1, COLOR_PLATFORM
+	j p_skip
+remove_platform:
+	la $a1, COLOR_BLACK
 p_skip:	beq $s7, 2, platform_lvl_2
 	beq $s7, 3, platform_lvl_3
 platform_lvl_1:
@@ -192,18 +198,20 @@ end_loop_p:
 	beq $a2, 33, p_3_3
 	beq $a2, 34, p_3_4
 	beq $a2, 35, p_3_5
-	beq $a3, 1, end_r_p_1
-	beq $a3, 2, end_r_p_2
-	beq $a3, 3, end_r_p_3
+	bnez $a3, remove_monster
 	j monster
 	
-
 # monster function
-monster:la $a1, COLOR_MONSTER
-	beq $s7, 2, monster_lvl_2
+monster:
+	li $a3,0
+	la $a1, COLOR_MONSTER
+	j m_skip
+remove_monster:
+	la $a1, COLOR_BLACK
+m_skip:	beq $s7, 2, monster_lvl_2
 	beq $s7, 3, monster_lvl_3
 monster_lvl_1:
-	j finish # no monster for level 1
+	j skip_paint_monster # no monster for level 1
 monster_lvl_2:
 	la $a2, 22
 	la $a0, MONSTER_2_1
@@ -224,6 +232,7 @@ m_3_3:	li $a2, 0
 paint_monster:
 	# $a0: position
 	# $a1: colour
+	# $a3 remove calling level
 	add $a0, $t0, $a0 # a0 = base + coordinate
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
@@ -237,6 +246,12 @@ paint_monster:
 	beq $a2, 22, m_2_2
 	beq $a2, 32, m_3_2
 	beq $a2, 33, m_3_3
+skip_paint_monster:
+	beq $a3, 1, end_r_p_1
+	beq $a3, 2, end_r_p_2
+	beq $a3, 3, end_r_p_3
+	beq $a3, 4, end_r_p_4
+	beq $a3, 5, end_r_p_5
 	j finish
 
 # finish line function
@@ -359,6 +374,8 @@ remove_player:
 	beq $t8, 0x31, next_level   # ASCII code of '31' is 0x64
 	beq $t8, 0x32, next_level   # ASCII code of '32' is 0x64
 	beq $t8, 0x33, next_level   # ASCII code of '33' is 0x64
+	beq $t8, 0x6b, win   # ASCII code of 'k' is 0x6b
+	beq $t8, 0x6c, lose   # ASCII code of 'l' is 0x6c
  
 wait:
  	li $t9, 0xffff0000  
@@ -372,9 +389,12 @@ keypress_happened :
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
 	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
-	beq $t8, 0x31, respond_to_1   # ASCII code of '31' is 0x64
-	beq $t8, 0x32, respond_to_2   # ASCII code of '32' is 0x64
-	beq $t8, 0x33, respond_to_3   # ASCII code of '33' is 0x64
+	beq $t8, 0x31, respond_to_1   # ASCII code of '1' is 0x31
+	beq $t8, 0x32, respond_to_2   # ASCII code of '2' is 0x32
+	beq $t8, 0x33, respond_to_3   # ASCII code of '3' is 0x32
+	beq $t8, 0x6b, respond_to_k   # ASCII code of 'k' is 0x6b
+	beq $t8, 0x6c, respond_to_l   # ASCII code of 'l' is 0x6c
+	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j wait
 
 respond_to_w:
@@ -405,25 +425,518 @@ right: 	addi $s1, $s1, 8 # x+4
 	
 respond_to_1:
 	li $a3, 1
-	j remove_platform
+	j remove_spike
 end_r_p_1:
 	li $s7, 1
 	j remove_player
 	
 respond_to_2:
 	li $a3, 2
-	j remove_platform
+	j remove_spike
 end_r_p_2:
 	li $s7, 2
 	j remove_player
 	
 respond_to_3:
 	li $a3, 3
-	j remove_platform
+	j remove_spike
 end_r_p_3:
 	li $s7, 3
 	j remove_player	
 	
+#p
+respond_to_p:
+	j Exit
+
 Exit:
  	li $v0, 10 # terminate the program gracefully 
  	syscall 
+
+#win screen
+respond_to_k:
+	li $a3, 4
+	j remove_spike
+end_r_p_4:
+	li $s7, 3
+	j remove_player	
+
+#lose screen
+respond_to_l:
+	li $a3, 5
+	j remove_spike
+end_r_p_5:
+	li $s7, 3
+	j remove_player
+
+#win
+win:	la $a1, COLOR_FINISH
+	li $a2, 1
+	addi $t7, $t0, 3920
+	j paint_you
+
+#lose screen
+lose:	la $a1, COLOR_RED
+	li $a2, 0
+	addi $t7, $t0, 3920
+	j paint_you
+ 	
+paint_lose:
+	# L
+	addi $t7, $t7, 2480
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	
+	#paint O
+	addi $t7, $t7, 32
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 528($t7)
+	sw $a1, 532($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	
+	#place holder
+	addi $t7, $t7, 32
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 784($t7)
+	
+	sw $a1, 1028($t7)
+	sw $a1, 1032($t7)
+	sw $a1, 1036($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	
+	# E
+	addi $t7, $t7, 32
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1032($t7)
+	sw $a1, 1036($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	j Exit
+	
+paint_win:
+	#W
+	addi $t7, $t7, 2492
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 32($t7)
+	sw $a1, 36($t7)
+	
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 288($t7)
+	sw $a1, 292($t7)
+
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 544($t7)
+	sw $a1, 548($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)	
+	sw $a1, 800($t7)
+	sw $a1, 804($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	sw $a1, 1056($t7)
+	sw $a1, 1060($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	sw $a1, 1312($t7)
+	sw $a1, 1316($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	sw $a1, 1560($t7)
+	sw $a1, 1564($t7)
+	sw $a1, 1568($t7)
+	sw $a1, 1572($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	sw $a1, 1816($t7)
+	sw $a1, 1820($t7)
+	sw $a1, 1824($t7)
+	sw $a1, 1828($t7)
+	
+	#place I
+	addi $t7, $t7, 48
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	
+	#N
+	addi $t7, $t7, 16
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 4($t7)
+	sw $a1, 24($t7)
+	sw $a1, 28($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 280($t7)
+	sw $a1, 284($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 520($t7)
+	sw $a1, 524($t7)
+	sw $a1, 536($t7)
+	sw $a1, 540($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 784($t7)
+	sw $a1, 792($t7)
+	sw $a1, 796($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1036($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	sw $a1, 1048($t7)
+	sw $a1, 1052($t7)
+	
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	sw $a1, 1304($t7)
+	sw $a1, 1308($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1556($t7)
+	sw $a1, 1560($t7)
+	sw $a1, 1564($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1816($t7)
+	sw $a1, 1820($t7)
+	j Exit
+	
+paint_you:
+	# paint Y
+	sw $a1, 0($t7)
+	sw $a1, 4($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 520($t7)
+	sw $a1, 524($t7)
+	sw $a1, 528($t7)
+	sw $a1, 532($t7)
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)
+	sw $a1, 1032($t7)
+	sw $a1, 1036($t7)
+	sw $a1, 1288($t7)
+	sw $a1, 1292($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	
+	
+	#paint O
+	addi $t7, $t7, 32
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 528($t7)
+	sw $a1, 532($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+	
+	#paint U
+	addi $t7, $t7, 32
+	sw $a1,($t7)
+	sw $a1, 4($t7)
+	sw $a1, 16($t7)
+	sw $a1, 20($t7)
+	
+	sw $a1, 256($t7)
+	sw $a1, 260($t7)
+	sw $a1, 272($t7)
+	sw $a1, 276($t7)
+	
+	sw $a1, 512($t7)
+	sw $a1, 516($t7)
+	sw $a1, 528($t7)
+	sw $a1, 532($t7)
+	
+	sw $a1, 768($t7)
+	sw $a1, 772($t7)
+	sw $a1, 784($t7)
+	sw $a1, 788($t7)
+	
+	sw $a1, 1024($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 1044($t7)
+	
+	sw $a1, 1280($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1296($t7)
+	sw $a1, 1300($t7)
+	
+	sw $a1, 1536($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1552($t7)
+	sw $a1, 1556($t7)
+	
+	sw $a1, 1792($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	sw $a1, 1808($t7)
+	sw $a1, 1812($t7)
+
+	beqz $a2, paint_lose
+	j paint_win
