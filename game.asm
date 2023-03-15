@@ -23,7 +23,7 @@
 .eqv	MONSTER_2_2	12592
 .eqv	MONSTER_3_1	14108
 .eqv	MONSTER_3_2	12612
-.eqv	MONSTER_3_3	9920
+.eqv	MONSTER_3_3	9408
 
 .eqv	SPIKE_1_1	14188
 .eqv	SPIKE_1_2	14204
@@ -31,7 +31,7 @@
 .eqv	SPIKE_2_1	11176
 .eqv	SPIKE_2_2	300
 .eqv	SPIKE_3_1	7964
-.eqv	SPIKE_3_2	8060
+.eqv	SPIKE_3_2	7540
 
 .eqv	PLATFORM_1_1	14128
 .eqv	PLATFORM_1_2	13212
@@ -39,8 +39,8 @@
 .eqv	PLATFORM_2_2	12432
 .eqv	PLATFORM_3_1	13892
 .eqv	PLATFORM_3_2	12452
-.eqv	PLATFORM_3_3	11200
-.eqv	PLATFORM_3_4	9320
+.eqv	PLATFORM_3_3	10688
+.eqv	PLATFORM_3_4	8800
 .eqv	PLATFORM_3_5	9220
 
 .eqv	GROUND		15360
@@ -75,7 +75,7 @@ monster_initial_pos:
  mpos_lvl_3:
  	li $s4, 14108 # enemy 1
  	li $s5, 12612 # enemy 2
- 	li $s6, 9920 # enemy 3
+ 	li $s6, 9408 # enemy 3
 
 # ground function
 ground:	la $a1, COLOR_GROUND
@@ -468,79 +468,11 @@ respond_to_a:
 	add $t7, $s1, $t7 #t7 = x + 32*y
 	add $t7, $t7, $t0 # t7 = base + offset
 	addi $t7, $t7, 2028  #t7 + 8 row below + 5 cell left
-	#
-	beq $s7, 1, collision_check_1
-	beq $s7, 2, collision_check_2
-	j collision_check_3
-a_check:
-	# $a3 next label
-	add $t6, $t6, $t0
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	beq $a3, 12, ac12
-	beq $a3, 13, ac13
-	beq $a3, 22, ac22
-	beq $a3, 23, ac23
-	beq $a3, 24, ac24
-	beq $a3, 32, ac32
-	beq $a3, 33, ac33
-	beq $a3, 34, ac34
-	beq $a3, 35, ac35
-	j remove_player
+	j collision_check
 left:	addi $s1, $s1, -4 # x-4
 	bgez $s1, paint_player
 	li $s1, 0 # cap x >= 0
 	j paint_player
-	
-# check collission for lvl 1
-collision_check_1:
-ac11:	li $a3, 12
-	la $t6, SPIKE_1_1 
-	j a_check
-ac12:	li $a3, 13
-	la $t6, SPIKE_1_2
-	j a_check
-ac13:	li $a3, 0
-	la $t6, SPIKE_1_3
-	j a_check
-#check collision for level 2
-collision_check_2:
-ac21:	li $a3, 22
-	la $t6, SPIKE_2_1 
-	j a_check
-ac22:	li $a3, 23
-	la $t6, SPIKE_2_2
-	j a_check
-ac23:	li $a3, 24
-	move $t6, $s4 #monster 1
-	j a_check
-ac24:	li $a3, 0
-	move $t6, $s5 #monster 2
-	j a_check
-#check collision for level 3
-collision_check_3:
-ac31:	li $a3, 32
-	la $t6, SPIKE_3_1 
-	j a_check
-ac32:	li $a3, 33
-	la $t6, SPIKE_3_2
-	j a_check
-ac33:	li $a3, 34
-	move $t6, $s4 #monster 1
-	j a_check
-ac34:	li $a3, 35
-	move $t6, $s5 #monster 2
-	j a_check
-ac35:	li $a3, 0
-	move $t6, $s6 #monster 3
-	j a_check
 	
 respond_to_s:
 	#collision check
@@ -548,18 +480,8 @@ respond_to_s:
 	mul $t7, $t7, $s2 #t7 = 32*y
 	add $t7, $s1, $t7 #t7 = x + 32*y
 	add $t7, $t7, $t0 # t7 = base + offset
-	addi $t7, $t7, 2316  #t7 + 9 row below + 4 cell right
-	
-	#
-	la $t6, SPIKE_1_1 
-	addi $t6, $t6,-4 #shift left once
-	add $t6, $t6, $t0
-	#sw $a1, ($t7)
-	bge $t7, $t6, cs
-	j remove_player
-cs: 	addi $t6, $t6, 32
-	ble $t7, $t6, wait
-	j remove_player
+	addi $t7, $t7, 2316  #t7 + 8 row below + 5 cell righ
+	j collision_check
 gravity:	
 	addi $s2, $s2, 4 # y+1
 	ble $s2, 204, paint_player
@@ -573,8 +495,67 @@ respond_to_d:
 	add $t7, $s1, $t7 #t7 = x + 32*y
 	add $t7, $t7, $t0 # t7 = base + offset
 	addi $t7, $t7, 2068  #t7 + 8 row below + 5 cell right
-	#
+	j collision_check
+right: 	addi $s1, $s1, 4 # x+4
+	ble $s1, 236, paint_player
+	li $s1, 236 # cap x >= 0
+	j paint_player
+	
+collision_check:
+	beq $s7, 1, collision_check_1
+	beq $s7, 2, collision_check_2
+	j collision_check_3
+#$a3, next label
+# check collission for lvl 1
+collision_check_1:
+c11:	li $a3, 12
 	la $t6, SPIKE_1_1 
+	j check_mt
+c12:	li $a3, 13
+	la $t6, SPIKE_1_2
+	j check_mt
+c13:	li $a3, 0
+	la $t6, SPIKE_1_3
+	j check_mt
+#check collision for level 2
+collision_check_2:
+c21:	li $a3, 22
+	la $t6, SPIKE_2_1 
+	j check_mt
+c22:	li $a3, 23
+	la $t6, SPIKE_2_2
+	j check_mt
+c23:	li $a3, 24
+	move $t6, $s4 #monster 1
+	j check_mt
+c24:	li $a3, 0
+	move $t6, $s5 #monster 2
+	j check_mt
+#check collision for level 3
+collision_check_3:
+c31:	li $a3, 32
+	la $t6, SPIKE_3_1 
+	j check_mt
+c32:	li $a3, 33
+	la $t6, SPIKE_3_2
+	j check_mt
+c33:	li $a3, 34
+	move $t6, $s4 #monster 1
+	j check_mt
+c34:	li $a3, 35
+	move $t6, $s5 #monster 2
+	j check_mt
+c35:	li $a3, 0
+	move $t6, $s6 #monster 3
+	j check_mt
+
+#check movement type
+check_mt:
+	beq $t8, 0x61, a_check   # ASCII code of 'a' is 0x61
+	beq $t8, 0x73, s_check   # ASCII code of 's' is 0x73 
+	j d_check
+a_check:
+	# $a3 next label
 	add $t6, $t6, $t0
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
@@ -585,11 +566,57 @@ respond_to_d:
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
 	beq $t6, $t7, wait
+	beq $a3, 12, c12
+	beq $a3, 13, c13
+	beq $a3, 22, c22
+	beq $a3, 23, c23
+	beq $a3, 24, c24
+	beq $a3, 32, c32
+	beq $a3, 33, c33
+	beq $a3, 34, c34
+	beq $a3, 35, c35
 	j remove_player
-right: 	addi $s1, $s1, 4 # x+4
-	ble $s1, 236, paint_player
-	li $s1, 236 # cap x >= 0
-	j paint_player
+	
+s_check:
+	addi $t6, $t6,-4 #shift left once
+	add $t6, $t6, $t0
+	bge $t7, $t6, cs
+	j s_check_next
+cs: 	addi $t6, $t6, 32
+	ble $t7, $t6, wait
+s_check_next:
+	beq $a3, 12, c12
+	beq $a3, 13, c13
+	beq $a3, 22, c22
+	beq $a3, 23, c23
+	beq $a3, 24, c24
+	beq $a3, 32, c32
+	beq $a3, 33, c33
+	beq $a3, 34, c34
+	beq $a3, 35, c35
+	j remove_player
+
+d_check:
+	add $t6, $t6, $t0
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	beq $a3, 12, c12
+	beq $a3, 13, c13
+	beq $a3, 22, c22
+	beq $a3, 23, c23
+	beq $a3, 24, c24
+	beq $a3, 32, c32
+	beq $a3, 33, c33
+	beq $a3, 34, c34
+	beq $a3, 35, c35
+	j remove_player
 	
 respond_to_1:
 	li $a3, 1
