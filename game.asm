@@ -457,55 +457,58 @@ keypress_happened :
 
 respond_to_w:
 	j remove_player
-jump:	addi $s2, $s2, -20 # y-1
+jump:	addi $s2, $s2, -20 	# y-1
 	bge $s2, 40, paint_player
-	li $s2, 40 # cap y >= 40
+	li $s2, 40 		# cap y >= 40
 	j paint_player
 	
 respond_to_a:
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 64*y
-	add $t7, $s1, $t7 #t7 = x + 32*y
-	add $t7, $t7, $t0 # t7 = base + offset
-	addi $t7, $t7, 2028  #t7 + 8 row below + 5 cell left
+	#modularize
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2028  	#t7 + 8 row below + 5 cell left
 	j collision_check
-left:	addi $s1, $s1, -4 # x-4
+left:	addi $s1, $s1, -4 	# x-4
 	bgez $s1, paint_player
-	li $s1, 0 # cap x >= 0
+	li $s1, 0 		# cap x >= 0
 	j paint_player
 	
 respond_to_s:
-	#collision check
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 32*y
-	add $t7, $s1, $t7 #t7 = x + 32*y
-	add $t7, $t7, $t0 # t7 = base + offset
-	addi $t7, $t7, 2316  #t7 + 8 row below + 5 cell righ
+	#modularize
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 32*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2316  	#t7 + 8 row below + 5 cell righ
 	j collision_check
 gravity:	
-	addi $s2, $s2, 4 # y+1
+	addi $s2, $s2, 4 	# y+1
 	ble $s2, 204, paint_player
-	li $s2, 204 # cap y <= 204
+	li $s2, 204 		# cap y <= 204
 	j paint_player
 
 respond_to_d:
-	#collision check
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 64*y
-	add $t7, $s1, $t7 #t7 = x + 32*y
-	add $t7, $t7, $t0 # t7 = base + offset
-	addi $t7, $t7, 2068  #t7 + 8 row below + 5 cell right
+	#modularize
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2068  	#t7 + 8 row below + 5 cell right
 	j collision_check
-right: 	addi $s1, $s1, 4 # x+4
+right: 	addi $s1, $s1, 4 	# x+4
 	ble $s1, 236, paint_player
-	li $s1, 236 # cap x >= 0
+	li $s1, 236 		# cap x >= 0
 	j paint_player
-	
+
+platform_check:
+	j remove_player
 collision_check:
+#$a3, next label
 	beq $s7, 1, collision_check_1
 	beq $s7, 2, collision_check_2
 	j collision_check_3
-#$a3, next label
 # check collission for lvl 1
 collision_check_1:
 c11:	li $a3, 12
@@ -575,7 +578,7 @@ a_check:
 	beq $a3, 33, c33
 	beq $a3, 34, c34
 	beq $a3, 35, c35
-	j remove_player
+	j platform_check
 	
 s_check:
 	addi $t6, $t6,-4 #shift left once
@@ -594,7 +597,7 @@ s_check_next:
 	beq $a3, 33, c33
 	beq $a3, 34, c34
 	beq $a3, 35, c35
-	j remove_player
+	j platform_check
 
 d_check:
 	add $t6, $t6, $t0
@@ -616,7 +619,7 @@ d_check:
 	beq $a3, 33, c33
 	beq $a3, 34, c34
 	beq $a3, 35, c35
-	j remove_player
+	j platform_check
 	
 respond_to_1:
 	li $a3, 1
