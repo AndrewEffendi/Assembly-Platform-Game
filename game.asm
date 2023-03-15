@@ -64,10 +64,18 @@ next_level:
  	li $s2, 204 # player's y-coordinate
  	
  	li $s3, 1 # double jump
-
- 	li $s4, 0 # enemy 1
- 	li $s5, 0 # enemy 2
- 	li $s6, 0 # enemy 3
+	
+	
+monster_initial_pos:
+	beq $s7, 3, mpos_lvl_3
+ mpos_lvl_1: # no monster
+ mpos_lvl_2:
+ 	li $s4, 14108 # enemy 1
+ 	li $s5, 12592 # enemy 2
+ mpos_lvl_3:
+ 	li $s4, 14108 # enemy 1
+ 	li $s5, 12612 # enemy 2
+ 	li $s6, 9920 # enemy 3
 
 # ground function
 ground:	la $a1, COLOR_GROUND
@@ -224,20 +232,25 @@ monster_lvl_1:
 	j skip_paint_monster # no monster for level 1
 monster_lvl_2:
 	la $a2, 22
-	la $a0, MONSTER_2_1
+	#la $a0, MONSTER_2_1
+	move $a0, $s4
 	j paint_monster
 m_2_2:	li $a2, 0
-	la $a0, MONSTER_2_2
+	#la $a0, MONSTER_2_2
+	move $a0, $s5
 	j paint_monster
 monster_lvl_3:
 	li $a2, 32
-	la $a0, MONSTER_3_1
+	#la $a0, MONSTER_3_1
+	move $a0, $s4
 	j paint_monster
 m_3_2:	li $a2, 33
-	la $a0, MONSTER_3_2
+	#la $a0, MONSTER_3_2
+	move $a0, $s5
 	j paint_monster
 m_3_3:	li $a2, 0
-	la $a0, MONSTER_3_3
+	#la $a0, MONSTER_3_3
+	move $a0, $s6
 	j paint_monster
 paint_monster:
 	# $a0: position
@@ -450,6 +463,24 @@ jump:	addi $s2, $s2, -20 # y-1
 	j paint_player
 	
 respond_to_a:
+	#collision check
+	li $t7, 64 	  #t7 = 64
+	mul $t7, $t7, $s2 #t7 = 64*y
+	add $t7, $s1, $t7 #t7 = x + 32*y
+	add $t7, $t7, $t0 # t7 = base + offset
+	addi $t7, $t7, 2028  #t7 + 8 row below + 5 cell left
+	#
+	la $t6, SPIKE_1_1 
+	add $t6, $t6, $t0
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
 	j remove_player
 left:	addi $s1, $s1, -4 # x-4
 	bgez $s1, paint_player
@@ -457,6 +488,22 @@ left:	addi $s1, $s1, -4 # x-4
 	j paint_player
 	
 respond_to_s:
+	#collision check
+	li $t7, 64 	  #t7 = 64
+	mul $t7, $t7, $s2 #t7 = 32*y
+	add $t7, $s1, $t7 #t7 = x + 32*y
+	add $t7, $t7, $t0 # t7 = base + offset
+	addi $t7, $t7, 2316  #t7 + 9 row below + 4 cell right
+	
+	#
+	la $t6, SPIKE_1_1 
+	addi $t6, $t6,-4 #shift left once
+	add $t6, $t6, $t0
+	#sw $a1, ($t7)
+	bge $t7, $t6, cs
+	j remove_player
+cs: 	addi $t6, $t6, 32
+	ble $t7, $t6, wait
 	j remove_player
 gravity:	
 	addi $s2, $s2, 4 # y+1
@@ -465,6 +512,24 @@ gravity:
 	j paint_player
 
 respond_to_d:
+	#collision check
+	li $t7, 64 	  #t7 = 64
+	mul $t7, $t7, $s2 #t7 = 64*y
+	add $t7, $s1, $t7 #t7 = x + 32*y
+	add $t7, $t7, $t0 # t7 = base + offset
+	addi $t7, $t7, 2068  #t7 + 8 row below + 5 cell right
+	#
+	la $t6, SPIKE_1_1 
+	add $t6, $t6, $t0
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+	beq $t6, $t7, wait
 	j remove_player
 right: 	addi $s1, $s1, 4 # x+4
 	ble $s1, 236, paint_player
