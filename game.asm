@@ -463,12 +463,6 @@ jump:	addi $s2, $s2, -20 	# y-1
 	j paint_player
 	
 respond_to_a:
-	#modularize
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2028  	#t7 + 8 row below + 5 cell left
 	j collision_check
 left:	addi $s1, $s1, -4 	# x-4
 	bgez $s1, paint_player
@@ -476,12 +470,6 @@ left:	addi $s1, $s1, -4 	# x-4
 	j paint_player
 	
 respond_to_s:
-	#modularize
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 32*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2316  	#t7 + 8 row below + 5 cell righ
 	j collision_check
 gravity:	
 	addi $s2, $s2, 4 	# y+1
@@ -490,12 +478,6 @@ gravity:
 	j paint_player
 
 respond_to_d:
-	#modularize
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2068  	#t7 + 8 row below + 5 cell right
 	j collision_check
 right: 	addi $s1, $s1, 4 	# x+4
 	ble $s1, 236, paint_player
@@ -504,9 +486,8 @@ right: 	addi $s1, $s1, 4 	# x+4
 
 platform_check:
 	beq $s7, 1, platform_check_1
-	#beq $s7, 2, platform_check_2
-	#j _check_platform_3
-	j remove_player
+	beq $s7, 2, platform_check_2
+	j platform_check_3
 #$a3, next label
 platform_check_1:
 p11:	li $a3, 12
@@ -540,20 +521,28 @@ p35:	li $a3, 0
 	j check_mtp
 
 check_mtp:
-	#beq $t8, 0x61, ap_check   # ASCII code of 'a' is 0x61
+	beq $t8, 0x61, vertical_p_check   # ASCII code of 'a' is 0x61
 	#beq $t8, 0x73, sp_check   # ASCII code of 's' is 0x73 
-	j dp_check
-dp_check:
+	j vertical_p_check
+vertical_p_check:
 	# modularize for loop 9
+	beq $t8, 0x61, vp_offset   # ASCII code of 'a' is 0x61
+vp_o_done:
 	add $t6, $t6, $t0
 	li $t5, 0
-loop_dpc:
-	bge $t5, 9, end_loop_dpc
+loop_vpc:
+	bge $t5, 9, end_loop_vpc
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
-    	j loop_dpc
-end_loop_dpc:
+    	j loop_vpc
+end_loop_vpc:
+	j platform_checked
+vp_offset:
+	subi $t7, $t7, 32
+	j vp_o_done
+	
+platform_checked:
 	beq $a3, 12, p12
 	beq $a3, 22, p22
 	beq $a3, 32, p32
@@ -615,31 +604,43 @@ c35:	li $a3, 0
 
 #check movement type
 check_mt:
-	beq $t8, 0x61, a_check   # ASCII code of 'a' is 0x61
-	beq $t8, 0x73, s_check   # ASCII code of 's' is 0x73 
-	j d_check
-a_check:
-	# $a3 next label
-	# modularize for loop 5
+	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
+	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x73 
+	j d_offset
+a_offset:
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2028  	#t7 + 8 row below + 5 cell left
+	j vertical_check
+d_offset:
+	#modularize
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2068  	#t7 + 8 row below + 5 cell right
+	j vertical_check
+s_offset:
+	#modularize
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 32*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
+	add $t7, $t7, $t0 	# t7 = base + offset
+	addi $t7, $t7, 2316  	#t7 + 8 row below + 5 cell righ
+	j s_check
+vertical_check:
 	add $t6, $t6, $t0
 	li $t5, 0
-loop_ac:
-	bge $t5, 5, end_loop_ac
+loop_vc:
+	bge $t5, 5, end_loop_vc
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
-    	j loop_ac
-end_loop_ac:
-	beq $a3, 12, c12
-	beq $a3, 13, c13
-	beq $a3, 22, c22
-	beq $a3, 23, c23
-	beq $a3, 24, c24
-	beq $a3, 32, c32
-	beq $a3, 33, c33
-	beq $a3, 34, c34
-	beq $a3, 35, c35
-	j platform_check
+    	j loop_vc
+end_loop_vc:
+	j collision_checked
 	
 s_check:
 	addi $t6, $t6,-4 #shift left once
@@ -649,29 +650,10 @@ s_check:
 cs: 	addi $t6, $t6, 32
 	ble $t7, $t6, wait
 s_check_next:
-	beq $a3, 12, c12
-	beq $a3, 13, c13
-	beq $a3, 22, c22
-	beq $a3, 23, c23
-	beq $a3, 24, c24
-	beq $a3, 32, c32
-	beq $a3, 33, c33
-	beq $a3, 34, c34
-	beq $a3, 35, c35
-	j platform_check
+	j collision_checked
 
-d_check:
-	# modularize for loop 5
-	add $t6, $t6, $t0
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
+collision_checked:
+	# $a3 next label
 	beq $a3, 12, c12
 	beq $a3, 13, c13
 	beq $a3, 22, c22
