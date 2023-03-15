@@ -503,12 +503,73 @@ right: 	addi $s1, $s1, 4 	# x+4
 	j paint_player
 
 platform_check:
+	beq $s7, 1, platform_check_1
+	#beq $s7, 2, platform_check_2
+	#j _check_platform_3
 	j remove_player
-collision_check:
 #$a3, next label
+platform_check_1:
+p11:	li $a3, 12
+	la $t6, PLATFORM_1_1 
+	j check_mtp
+p12:	li $a3, 0
+	la $t6, PLATFORM_1_2
+	j check_mtp
+platform_check_2:
+p21:	li $a3, 22
+	la $t6, PLATFORM_2_1 
+	j check_mtp
+p22:	li $a3, 0
+	la $t6, PLATFORM_2_2
+	j check_mtp
+platform_check_3:
+p31:	li $a3, 32
+	la $t6, PLATFORM_3_1 
+	j check_mtp
+p32:	li $a3, 33
+	la $t6, PLATFORM_3_2
+	j check_mtp
+p33:	li $a3, 34
+	la $t6, PLATFORM_3_3 
+	j check_mtp
+p34:	li $a3, 35
+	la $t6, PLATFORM_3_4
+	j check_mtp
+p35:	li $a3, 0
+	la $t6, PLATFORM_3_5 
+	j check_mtp
+
+check_mtp:
+	#beq $t8, 0x61, ap_check   # ASCII code of 'a' is 0x61
+	#beq $t8, 0x73, sp_check   # ASCII code of 's' is 0x73 
+	j dp_check
+dp_check:
+	# modularize for loop 9
+	add $t6, $t6, $t0
+	li $t5, 0
+loop_dpc:
+	bge $t5, 9, end_loop_dpc
+	beq $t6, $t7, wait
+	addi $t6, $t6, 256
+    	addi $t5, $t5, 1
+    	j loop_dpc
+end_loop_dpc:
+	beq $a3, 12, p12
+	beq $a3, 22, p22
+	beq $a3, 32, p32
+	beq $a3, 33, p33
+	beq $a3, 34, p34
+	beq $a3, 35, p35
+	j remove_player
+	
+	
+	
+	
+collision_check:
 	beq $s7, 1, collision_check_1
 	beq $s7, 2, collision_check_2
 	j collision_check_3
+#$a3, next label
 # check collission for lvl 1
 collision_check_1:
 c11:	li $a3, 12
@@ -559,16 +620,16 @@ check_mt:
 	j d_check
 a_check:
 	# $a3 next label
+	# modularize for loop 5
 	add $t6, $t6, $t0
+	li $t5, 0
+loop_ac:
+	bge $t5, 5, end_loop_ac
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
-	addi $t6, $t6, 256
-	beq $t6, $t7, wait
+    	addi $t5, $t5, 1
+    	j loop_ac
+end_loop_ac:
 	beq $a3, 12, c12
 	beq $a3, 13, c13
 	beq $a3, 22, c22
@@ -600,6 +661,7 @@ s_check_next:
 	j platform_check
 
 d_check:
+	# modularize for loop 5
 	add $t6, $t6, $t0
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
