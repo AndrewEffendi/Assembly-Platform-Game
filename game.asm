@@ -19,24 +19,24 @@
 .eqv	COLOR_FINISH	0xf5da0f
 .eqv	COLOR_HEALTH	0xff0000
 
-.eqv	MONSTER_2_1	14620
-.eqv	MONSTER_2_2	13204
-.eqv	MONSTER_3_1	14620
-.eqv	MONSTER_3_2	13124
-.eqv	MONSTER_3_3	10432
+.eqv	MONSTER_2_1	14108
+.eqv	MONSTER_2_2	12592
+.eqv	MONSTER_3_1	14108
+.eqv	MONSTER_3_2	12612
+.eqv	MONSTER_3_3	9920
 
-.eqv	SPIKE_1_1	14704
-.eqv	SPIKE_1_2	14720
-.eqv	SPIKE_1_3	14736
-.eqv	SPIKE_2_1	11588
+.eqv	SPIKE_1_1	14188
+.eqv	SPIKE_1_2	14204
+.eqv	SPIKE_1_3	14220
+.eqv	SPIKE_2_1	11176
 .eqv	SPIKE_2_2	300
-.eqv	SPIKE_3_1	8552
-.eqv	SPIKE_3_2	8480
+.eqv	SPIKE_3_1	7964
+.eqv	SPIKE_3_2	8060
 
 .eqv	PLATFORM_1_1	14128
 .eqv	PLATFORM_1_2	13212
-.eqv	PLATFORM_2_1	13972
-.eqv	PLATFORM_2_2	12332
+.eqv	PLATFORM_2_1	13872
+.eqv	PLATFORM_2_2	12432
 .eqv	PLATFORM_3_1	13892
 .eqv	PLATFORM_3_2	12452
 .eqv	PLATFORM_3_3	11200
@@ -45,7 +45,7 @@
 
 .eqv	GROUND		15360
 .eqv	FINISH_1	15592
-.eqv	FINISH_2	12332
+.eqv	FINISH_2	12432
 .eqv	FINISH_3	9220
 
 .eqv	HEALTH_1	520
@@ -56,7 +56,7 @@
 	li $t0, BASE_ADDRESS # $t0 stores the base address for display 
  	
 reset:	li $s0, 5 # health
-	li $s7, 3 # level
+	li $s7, 2 # level
 
 next_level:
 	
@@ -125,11 +125,27 @@ paint_spike:
 	# $a2: next label
 	# $a3 remove calling level
 	add $a0, $t0, $a0 # a0 = base + coordinate
-	sw $a1, 4($a0)
-	sw $a1, 260($a0)
+	sw $a1, 8($a0)
+	sw $a1, 256($a0)
+	sw $a1, 264($a0)
+	sw $a1, 272($a0)
 	sw $a1, 512($a0)
-	sw $a1, 516($a0)
 	sw $a1, 520($a0)
+	sw $a1, 528($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	
+	#sw $a1, 4($a0)
+	#sw $a1, 260($a0)
+	#sw $a1, 512($a0)
+	#sw $a1, 516($a0)
+	#sw $a1, 520($a0)
 	beq $a2, 12, s_1_2
 	beq $a2, 13, s_1_3
 	beq $a2, 22, s_2_2
@@ -237,12 +253,27 @@ paint_monster:
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 520($a0)
+	sw $a1, 524($a0)
+	sw $a1, 528($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1040($a0)
+	
 	beq $a2, 22, m_2_2
 	beq $a2, 32, m_3_2
 	beq $a2, 33, m_3_3
