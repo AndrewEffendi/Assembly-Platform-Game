@@ -521,26 +521,58 @@ p35:	li $a3, 0
 	j check_mtp
 
 check_mtp:
-	beq $t8, 0x61, vertical_p_check   # ASCII code of 'a' is 0x61
-	#beq $t8, 0x73, sp_check   # ASCII code of 's' is 0x73 
+	#remove
+	#j remove_player
+	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
+	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
+	j dp_offset
+ap_offset:
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 64*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 1988  	#t7 + 8 row below + 5 cell left
 	j vertical_p_check
+dp_offset:
+	#modularize
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 64*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
+	j vertical_p_check
+sp_offset:
+	#modularize
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
+	#j sp_check
+	
 vertical_p_check:
-	# modularize for loop 9
-	beq $t8, 0x61, vp_offset   # ASCII code of 'a' is 0x61
-vp_o_done:
+#$a0 player location + offset
 	add $t6, $t6, $t0
 	li $t5, 0
 loop_vpc:
 	bge $t5, 9, end_loop_vpc
-	beq $t6, $t7, wait
+	beq $t6, $a0, wait
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
     	j loop_vpc
 end_loop_vpc:
 	j platform_checked
-vp_offset:
-	subi $t7, $t7, 32
-	j vp_o_done
+
+sp_check:
+#$a0 player location + offset
+	addi $t6, $t6,-4 #shift left once
+	add $t6, $t6, $t0
+	bge $a0, $t6, cs
+	j sp_check_next
+csp: 	addi $t6, $t6, 32
+	ble $a0, $t6, wait
+sp_check_next:
+	j collision_checked
 	
 platform_checked:
 	beq $a3, 12, p12
@@ -608,34 +640,36 @@ check_mt:
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x73 
 	j d_offset
 a_offset:
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2028  	#t7 + 8 row below + 5 cell left
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 64*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 2028  	#t7 + 8 row below + 5 cell left
 	j vertical_check
 d_offset:
 	#modularize
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2068  	#t7 + 8 row below + 5 cell right
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 64*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
 	j vertical_check
 s_offset:
 	#modularize
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 32*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	add $t7, $t7, $t0 	# t7 = base + offset
-	addi $t7, $t7, 2316  	#t7 + 8 row below + 5 cell righ
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
 	j s_check
+	
 vertical_check:
+#$a0 player location + offset
 	add $t6, $t6, $t0
 	li $t5, 0
 loop_vc:
 	bge $t5, 5, end_loop_vc
-	beq $t6, $t7, wait
+	beq $t6, $a0, wait
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
     	j loop_vc
@@ -643,12 +677,13 @@ end_loop_vc:
 	j collision_checked
 	
 s_check:
+#$a0 player location + offset
 	addi $t6, $t6,-4 #shift left once
 	add $t6, $t6, $t0
-	bge $t7, $t6, cs
+	bge $a0, $t6, cs
 	j s_check_next
 cs: 	addi $t6, $t6, 32
-	ble $t7, $t6, wait
+	ble $a0, $t6, wait
 s_check_next:
 	j collision_checked
 
