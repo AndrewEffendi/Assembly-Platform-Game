@@ -548,7 +548,7 @@ sp_offset:
 	add $a0, $s1, $a0 	#t7 = x + 32*y
 	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
-	#j sp_check
+	j sp_check
 	
 vertical_p_check:
 #$a0 player location + offset
@@ -567,12 +567,12 @@ sp_check:
 #$a0 player location + offset
 	addi $t6, $t6,-4 #shift left once
 	add $t6, $t6, $t0
-	bge $a0, $t6, cs
+	bge $a0, $t6, csp
 	j sp_check_next
-csp: 	addi $t6, $t6, 32
+csp: 	addi $t6, $t6, 72
 	ble $a0, $t6, wait
 sp_check_next:
-	j collision_checked
+	j platform_checked
 	
 platform_checked:
 	beq $a3, 12, p12
