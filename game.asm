@@ -61,7 +61,7 @@ reset:	li $s0, 5 # health
 next_level:
 	
  	li $s1, 0 # player's x-coordinate
- 	li $s2, 212 # player's y-coordinate
+ 	li $s2, 204 # player's y-coordinate
  	
  	li $s3, 1 # double jump
 
@@ -140,12 +140,6 @@ paint_spike:
 	sw $a1, 1032($a0)
 	sw $a1, 1036($a0)
 	sw $a1, 1040($a0)
-	
-	#sw $a1, 4($a0)
-	#sw $a1, 260($a0)
-	#sw $a1, 512($a0)
-	#sw $a1, 516($a0)
-	#sw $a1, 520($a0)
 	beq $a2, 12, s_1_2
 	beq $a2, 13, s_1_3
 	beq $a2, 22, s_2_2
@@ -260,7 +254,6 @@ paint_monster:
 	sw $a1, 264($a0)
 	sw $a1, 268($a0)
 	sw $a1, 272($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 520($a0)
@@ -273,7 +266,6 @@ paint_monster:
 	sw $a1, 784($a0)
 	sw $a1, 1024($a0)
 	sw $a1, 1040($a0)
-	
 	beq $a2, 22, m_2_2
 	beq $a2, 32, m_3_2
 	beq $a2, 33, m_3_3
@@ -351,27 +343,38 @@ paint_player:
 	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
 	add $t7, $s1, $t7 #t7 = x + 64*y
 	add $t7, $t7, $t0
-	la $a1, COLOR_BLUE
+	la $a1, COLOR_RED
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
-	sw $a1, 256($t7)
+	sw $a1, 12($t7)
 	sw $a1, 260($t7)
 	sw $a1, 264($t7)
 	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1036($t7)
 	la $a1, COLOR_CREAM
 	sw $a1, 516($t7)
 	sw $a1, 520($t7)
-	sw $a1, 768($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
-	la $a1, COLOR_RED
+	sw $a1, 524($t7)
 	sw $a1, 772($t7)
 	sw $a1, 776($t7)
-	sw $a1, 1028($t7)
+	sw $a1, 780($t7)
+	sw $a1, 1024($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 2052($t7)
+	sw $a1, 2060($t7)
+	la $a1, COLOR_BLUE
 	sw $a1, 1032($t7)
 	sw $a1, 1284($t7)
 	sw $a1, 1288($t7)
+	sw $a1, 1292($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
 	j wait
 	
 remove_player:
@@ -382,22 +385,33 @@ remove_player:
 	la $a1, COLOR_BLACK
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
-	sw $a1, 256($t7)
+	sw $a1, 12($t7)
 	sw $a1, 260($t7)
 	sw $a1, 264($t7)
 	sw $a1, 268($t7)
+	sw $a1, 272($t7)
 	sw $a1, 516($t7)
 	sw $a1, 520($t7)
-	sw $a1, 768($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
+	sw $a1, 524($t7)
 	sw $a1, 772($t7)
 	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 1024($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 2052($t7)
+	sw $a1, 2060($t7)
 	sw $a1, 1028($t7)
 	sw $a1, 1032($t7)
+	sw $a1, 1036($t7)
 	sw $a1, 1284($t7)
 	sw $a1, 1288($t7)
+	sw $a1, 1292($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
 	beq $t8, 0x77, jump   	# ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, left   	# ASCII code of 'a' is 0x61
 	beq $t8, 0x73, gravity  # ASCII code of 's' is 0x73 
@@ -429,29 +443,32 @@ keypress_happened :
 	j wait
 
 respond_to_w:
-	ble $s2, 40, wait
-	blez $s2, wait
 	j remove_player
-jump:	addi $s2, $s2, -16 # y-1
+jump:	addi $s2, $s2, -20 # y-1
+	bge $s2, 40, paint_player
+	li $s2, 40 # cap y >= 40
 	j paint_player
 	
 respond_to_a:
-	blez $s1, wait
 	j remove_player
-left:	addi $s1, $s1, -8 # x-4
+left:	addi $s1, $s1, -4 # x-4
+	bgez $s1, paint_player
+	li $s1, 0 # cap x >= 0
 	j paint_player
 	
 respond_to_s:
-	bge $s2, 212, wait
 	j remove_player
 gravity:	
 	addi $s2, $s2, 4 # y+1
+	ble $s2, 204, paint_player
+	li $s2, 204 # cap y <= 204
 	j paint_player
 
 respond_to_d:
-	bge $s1, 240, wait
 	j remove_player
-right: 	addi $s1, $s1, 8 # x+4
+right: 	addi $s1, $s1, 4 # x+4
+	ble $s1, 236, paint_player
+	li $s1, 236 # cap x >= 0
 	j paint_player
 	
 respond_to_1:
