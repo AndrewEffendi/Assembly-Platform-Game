@@ -63,7 +63,7 @@ next_level:
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
  	
- 	li $s3, 1 # double jump
+ 	li $s3, 0 # double jump
 	
 	
 monster_initial_pos:
@@ -348,7 +348,8 @@ paint_health:
 	beq $a2, 3, h_3
 	j player
 	
-# player function	
+# player function
+# $a1 color #a2 loop jump	
 player:
 	j paint_player
 paint_player:
@@ -388,6 +389,10 @@ paint_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
+	beq $s3, 1, jump_2
+	beq $s3, 2, jump_3
+	beq $s3, 3, jump_4
+	beq $s3, 4, jump_5
 	j wait
 	
 remove_player:
@@ -456,8 +461,19 @@ keypress_happened :
 	j wait
 
 respond_to_w:
-	j remove_player
-jump:	addi $s2, $s2, -20 	# y-1
+	j collision_check
+	#j remove_player
+jump_1: li $s3, 1
+	j jump
+jump_2: li $s3, 2
+	j jump
+jump_3: li $s3, 3
+	j jump
+jump_4: li $s3, 4
+	j jump
+jump_5: li $s3, 5
+	j jump
+jump:	addi $s2, $s2, -4 	# y-1
 	bge $s2, 40, paint_player
 	li $s2, 40 		# cap y >= 40
 	j paint_player
@@ -523,9 +539,19 @@ p35:	li $a3, 0
 check_mtp:
 	#remove
 	#j remove_player
+	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
 	j dp_offset
+wp_offset:
+	#TODO
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, -244  	#t7 + 8 row below + 5 cell righ
+	j sp_check
+
 ap_offset:
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 64*y
@@ -637,8 +663,9 @@ c35:	li $a3, 0
 #check movement type
 check_mt:
 	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
-	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x73 
-	j d_offset
+	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
+	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
+	j platform_check
 a_offset:
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 64*y
