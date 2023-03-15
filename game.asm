@@ -463,14 +463,17 @@ jump:	addi $s2, $s2, -20 # y-1
 	j paint_player
 	
 respond_to_a:
-	#collision check
 	li $t7, 64 	  #t7 = 64
 	mul $t7, $t7, $s2 #t7 = 64*y
 	add $t7, $s1, $t7 #t7 = x + 32*y
 	add $t7, $t7, $t0 # t7 = base + offset
 	addi $t7, $t7, 2028  #t7 + 8 row below + 5 cell left
 	#
-	la $t6, SPIKE_1_1 
+	beq $s7, 1, collision_check_1
+	beq $s7, 2, collision_check_2
+	j collision_check_3
+a_check:
+	# $a3 next label
 	add $t6, $t6, $t0
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
@@ -481,11 +484,63 @@ respond_to_a:
 	beq $t6, $t7, wait
 	addi $t6, $t6, 256
 	beq $t6, $t7, wait
+	beq $a3, 12, ac12
+	beq $a3, 13, ac13
+	beq $a3, 22, ac22
+	beq $a3, 23, ac23
+	beq $a3, 24, ac24
+	beq $a3, 32, ac32
+	beq $a3, 33, ac33
+	beq $a3, 34, ac34
+	beq $a3, 35, ac35
 	j remove_player
 left:	addi $s1, $s1, -4 # x-4
 	bgez $s1, paint_player
 	li $s1, 0 # cap x >= 0
 	j paint_player
+	
+# check collission for lvl 1
+collision_check_1:
+ac11:	li $a3, 12
+	la $t6, SPIKE_1_1 
+	j a_check
+ac12:	li $a3, 13
+	la $t6, SPIKE_1_2
+	j a_check
+ac13:	li $a3, 0
+	la $t6, SPIKE_1_3
+	j a_check
+#check collision for level 2
+collision_check_2:
+ac21:	li $a3, 22
+	la $t6, SPIKE_2_1 
+	j a_check
+ac22:	li $a3, 23
+	la $t6, SPIKE_2_2
+	j a_check
+ac23:	li $a3, 24
+	move $t6, $s4 #monster 1
+	j a_check
+ac24:	li $a3, 0
+	move $t6, $s5 #monster 2
+	j a_check
+#check collision for level 3
+collision_check_3:
+ac31:	li $a3, 32
+	la $t6, SPIKE_3_1 
+	j a_check
+ac32:	li $a3, 33
+	la $t6, SPIKE_3_2
+	j a_check
+ac33:	li $a3, 34
+	move $t6, $s4 #monster 1
+	j a_check
+ac34:	li $a3, 35
+	move $t6, $s5 #monster 2
+	j a_check
+ac35:	li $a3, 0
+	move $t6, $s6 #monster 3
+	j a_check
 	
 respond_to_s:
 	#collision check
