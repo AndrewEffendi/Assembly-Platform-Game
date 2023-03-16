@@ -393,6 +393,8 @@ jump_count:
 	beq $t0, 2, jump_3
 	beq $t0, 3, jump_4
 	beq $t0, 4, jump_5
+	j finish_check
+finished_check:
 	j wait
 	
 remove_player:
@@ -504,6 +506,29 @@ right: 	addi $s1, $s1, 4 	# x+4
 	ble $s1, 236, paint_player
 	li $s1, 236 		# cap x >= 0
 	j paint_player
+
+finish_check:
+	beq $s7, 1, finish_check_1
+	#beq $s7, 2, finish_check_2
+	#j finish_check_3
+	j finished_check
+finish_check_1:
+	#li $t6, FINISH_1
+	# player location
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	#addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
+	addi $a0, $a0, 2308 # 10 row down + 1 cell right
+	li $t6, FINISH_1
+	#addi $t6, $t6, BASE_ADDRESS
+	beq $a0, $t6, respond_to_2
+	j finished_check
+	#j jump_count
+finish_check_2:
+finish_check_3:
+
+
 
 platform_check:
 	beq $s7, 1, platform_check_1
@@ -712,6 +737,7 @@ collision_checked:
 	
 respond_to_1:
 	li $a3, 1
+	li $t8, 0x31
 	j remove_spike
 end_r_p_1:
 	li $s7, 1
@@ -719,6 +745,7 @@ end_r_p_1:
 	
 respond_to_2:
 	li $a3, 2
+	li $t8, 0x32
 	j remove_spike
 end_r_p_2:
 	li $s7, 2
@@ -726,6 +753,7 @@ end_r_p_2:
 	
 respond_to_3:
 	li $a3, 3
+	li $t8, 0x33
 	j remove_spike
 end_r_p_3:
 	li $s7, 3
