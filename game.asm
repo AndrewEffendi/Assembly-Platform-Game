@@ -448,6 +448,10 @@ wait:
  	li $t9, 0xffff0000  
 	lw $t8, 0($t9) 
 	beq $t8, 1, keypress_happened 
+	
+	li $v0, 32 
+	li $a0, 10   # Wait one second (40 milliseconds) 
+	syscall 
 	j wait
 
 keypress_happened :	
