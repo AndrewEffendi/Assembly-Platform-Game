@@ -330,6 +330,8 @@ rh_2:	la, $a0, HEALTH_2
 rh_1:	la, $a0, HEALTH_1
 	j paint_health
 removed_health:
+	j damage_player
+player_damaged:
 	addi $s0, $s0, -1 #ewduced health by 1
 	beqz $s0, respond_to_l # if no heart lose
 	j wait
@@ -463,6 +465,78 @@ remove_player:
 	beq $t8, 0x33, next_level   # ASCII code of '33' is 0x64
 	beq $t8, 0x6b, win   # ASCII code of 'k' is 0x6b
 	beq $t8, 0x6c, lose   # ASCII code of 'l' is 0x6c
+
+damage_player:
+	li $t7, 64 	  #t7 = 64
+	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
+	add $t7, $s1, $t7 #t7 = x + 64*y
+	addi $t7, $t7, BASE_ADDRESS
+	la $a1, COLOR_RED
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1036($t7)
+	sw $a1, 516($t7)
+	sw $a1, 520($t7)
+	sw $a1, 524($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 1024($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 2052($t7)
+	sw $a1, 2060($t7)
+	sw $a1, 1032($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1288($t7)
+	sw $a1, 1292($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7)
+	li $v0, 32 
+	li $a0, 100   # Wait one second (100 milliseconds) 
+	syscall 
+	la $a1, COLOR_RED
+	sw $a1, 4($t7)
+	sw $a1, 8($t7)
+	sw $a1, 12($t7)
+	sw $a1, 260($t7)
+	sw $a1, 264($t7)
+	sw $a1, 268($t7)
+	sw $a1, 272($t7)
+	sw $a1, 1028($t7)
+	sw $a1, 1036($t7)
+	la $a1, COLOR_CREAM
+	sw $a1, 516($t7)
+	sw $a1, 520($t7)
+	sw $a1, 524($t7)
+	sw $a1, 772($t7)
+	sw $a1, 776($t7)
+	sw $a1, 780($t7)
+	sw $a1, 1024($t7)
+	sw $a1, 1040($t7)
+	sw $a1, 2052($t7)
+	sw $a1, 2060($t7)
+	la $a1, COLOR_BLUE
+	sw $a1, 1032($t7)
+	sw $a1, 1284($t7)
+	sw $a1, 1288($t7)
+	sw $a1, 1292($t7)
+	sw $a1, 1540($t7)
+	sw $a1, 1544($t7)
+	sw $a1, 1548($t7)
+	sw $a1, 1796($t7)
+	sw $a1, 1800($t7)
+	sw $a1, 1804($t7) 
+	j player_damaged
 	
  
 wait:
