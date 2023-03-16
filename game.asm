@@ -73,8 +73,9 @@ next_level:
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
  	li $s3, 2 # double jump
- 	li $s4, 20 #0 to 40 range
+ 	li $s4, 0 #0 to 40 range
  	li $s5, 0
+ 	li $s6, 1 # reset clock to 0
  	li $t0, 0 # jump counter
 
 # ground function
@@ -221,7 +222,7 @@ end_loop_p:
 	
 # monster function
 monster:
-	li $a3,0
+	li $a3,0 # $s3: remove calling function, monster not remove
 	la $a1, COLOR_MONSTER
 	j m_skip
 remove_monster:
@@ -283,12 +284,19 @@ paint_monster:
 	beq $a2, 32, m_3_2
 	beq $a2, 33, m_3_3
 skip_paint_monster:
+	# move monster
+	beqz $s6, move_monster_next
 	beq $a3, 1, end_r_p_1
 	beq $a3, 2, end_r_p_2
 	beq $a3, 3, end_r_p_3
 	beq $a3, 4, end_r_p_4
 	beq $a3, 5, end_r_p_5
 	j finish
+
+move_monster_next:
+	la $t7, COLOR_BLACK
+	beq $a1, $t7 , remove_monster_done
+	j move_monster_done
 
 # finish line function
 finish:	la $a1, COLOR_FINISH
@@ -547,10 +555,23 @@ wait:
 	lw $t8, 0($t9) 
 	beq $t8, 1, keypress_happened 
 	
+	addi $s6, $s6, 1
+	beq $s6, 100, one_second #1 second
+one_second_done:	
 	li $v0, 32 
-	li $a0, 10   # Wait 40 milliseconds 
+	li $a0, 10   # Wait 10 milliseconds 
 	syscall 
 	j wait
+
+one_second:
+	li $s6, 0 # reset clock to 0
+	j remove_monster
+remove_monster_done: 
+	addi $s4, $s4, 4 #move monster right
+	j monster
+move_monster_done:
+	li $t8, 0x73
+	j respond_to_s #go down once
 
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
@@ -662,7 +683,7 @@ jc35:	li $a3, 0
 jump_check_patform:
 	li $t7, -2 # init t7 = 0
 loop_jcp:
-	bge $t7, 17, end_loop_jcp
+	bge $t7, 15, end_loop_jcp
 	li $t5, 4	  # 4 bytes
 	mul $t5, $t5, $t7 # offset = 4 bytes * index
 	add $t5, $t5, $a1 # t5 = address + offset
