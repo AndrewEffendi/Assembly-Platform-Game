@@ -64,7 +64,7 @@
   # s7: level
   # t0: jump counter
  	
-reset:	li $s0, 5 # health
+reset:	li $s0, 3 # health
 	li $s7, 2 # level
 
 next_level:
@@ -315,14 +315,35 @@ paint_finish:
 	j health
 
 # health function
+remove_health:
+	la, $a1, COLOR_BLACK
+	li $a2, 4
+	beq $s0, 3, rh_3
+	beq $s0, 2, rh_2
+	beq $s0, 1, rh_1
+	#remove
+	j respond_to_l
+rh_3:	la, $a0, HEALTH_3
+	j paint_health
+rh_2:	la, $a0, HEALTH_2
+	j paint_health
+rh_1:	la, $a0, HEALTH_1
+	j paint_health
+removed_health:
+	addi $s0, $s0, -1 #ewduced health by 1
+	beqz $s0, respond_to_l # if no heart lose
+	j wait
+
 health:	la, $a1, COLOR_HEALTH
 	li $a2, 2
 	la, $a0, HEALTH_1
 	j paint_health
-h_2:	li $a2, 3
+h_2:	blt $s0, 2, player #if health less than 2 don't paint
+	li $a2, 3
 	la, $a0, HEALTH_2
 	j paint_health
-h_3:	li $a2, 0
+h_3:	blt $s0, 3, player #if health less than 3 don't paint
+	li $a2, 0
 	la, $a0, HEALTH_3
 	j paint_health
 paint_health:
@@ -345,6 +366,7 @@ paint_health:
 	sw $a1, 776($a0)
 	beq $a2, 2, h_2
 	beq $a2, 3, h_3
+	beq $a2, 4, removed_health
 	j player
 	
 # player function
@@ -725,7 +747,7 @@ vertical_check:
 loop_vc:
 	bge $t5, 5, end_loop_vc
 	# here damage
-	beq $t6, $a0, wait
+	beq $t6, $a0, damaged
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
     	j loop_vc
@@ -740,7 +762,7 @@ s_check:
 	j s_check_next
 cs: 	addi $t6, $t6, 32
 	# here damage
-	ble $a0, $t6, wait
+	ble $a0, $t6, damaged
 s_check_next:
 	j collision_checked
 
@@ -756,8 +778,12 @@ collision_checked:
 	beq $a3, 34, c34
 	beq $a3, 35, c35
 	j platform_check
+
+damaged:
+	j remove_health
 	
 respond_to_1:
+	li $s0, 3 # set health to 3
 	li $a3, 1
 	li $t8, 0x31
 	j remove_spike
