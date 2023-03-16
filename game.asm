@@ -555,7 +555,7 @@ wait:
 	beq $t8, 1, keypress_happened 
 	
 	addi $s6, $s6, 1
-	beq $s6, 100, one_second #0.5 second
+	beq $s6, 50, one_second #0.5 second
 	li $v0, 32 
 	li $a0, 10   # Wait 10 milliseconds 
 	syscall 
