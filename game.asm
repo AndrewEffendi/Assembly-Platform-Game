@@ -233,28 +233,23 @@ monster_lvl_2:
 	la $a2, 22
 	la $a0, MONSTER_2_1
 	add $a0, $a0, $s4
-	#move $a0, $s4
 	j paint_monster
 m_2_2:	li $a2, 0
 	la $a0, MONSTER_2_2
 	add $a0, $a0, $s4
-	#move $a0, $s5
 	j paint_monster
 monster_lvl_3:
 	li $a2, 32
 	la $a0, MONSTER_3_1
 	add $a0, $a0, $s4
-	#move $a0, $s4
 	j paint_monster
 m_3_2:	li $a2, 33
 	la $a0, MONSTER_3_2
 	add $a0, $a0, $s4
-	#move $a0, $s5
 	j paint_monster
 m_3_3:	li $a2, 0
 	la $a0, MONSTER_3_3
 	add $a0, $a0, $s4
-	#move $a0, $s6
 	j paint_monster
 paint_monster:
 	# $a0: position
@@ -393,6 +388,11 @@ paint_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
+jump_count:
+	beq $t0, 1, jump_2
+	beq $t0, 2, jump_3
+	beq $t0, 3, jump_4
+	beq $t0, 4, jump_5
 	j wait
 	
 remove_player:
@@ -440,13 +440,6 @@ remove_player:
 	beq $t8, 0x6b, win   # ASCII code of 'k' is 0x6b
 	beq $t8, 0x6c, lose   # ASCII code of 'l' is 0x6c
 	
-jump_count:
-	beq $s3, 0, jump_1
-	beq $s3, 1, jump_2
-	beq $s3, 2, jump_3
-	beq $s3, 3, jump_4
-	beq $s3, 4, jump_5
-	
  
 wait:
  	li $t9, 0xffff0000  
@@ -460,7 +453,8 @@ wait:
 
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
-	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
+	#beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
+	beq $t8, 0x77, jump_1   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
 	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
@@ -472,16 +466,16 @@ keypress_happened :
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j wait
 
-jump_1: li $s3, 1
-	j jump
-jump_2: li $s3, 2
-	j jump
-jump_3: li $s3, 3
-	j jump
-jump_4: li $s3, 4
-	j jump
-jump_5: li $s3, 5
-	j jump
+jump_1: li $t0, 1
+	j respond_to_w
+jump_2: li $t0, 2
+	j respond_to_w
+jump_3: li $t0, 3
+	j respond_to_w
+jump_4: li $t0, 4
+	j respond_to_w
+jump_5: li $t0, 0
+	j respond_to_w
 respond_to_w:
 	j collision_check
 jump:	addi $s2, $s2, -4 	# y-1
@@ -633,12 +627,10 @@ c22:	li $a3, 23
 c23:	li $a3, 24
 	la $t6, MONSTER_2_1
 	add $t6, $t6, $s4
-	#move $t6, $s4 #monster 1
 	j check_mt
 c24:	li $a3, 0
 	la $t6, MONSTER_2_2
 	add $t6, $t6, $s4
-	#move $t6, $s5 #monster 2
 	j check_mt
 #check collision for level 3
 collision_check_3:
@@ -651,17 +643,14 @@ c32:	li $a3, 33
 c33:	li $a3, 34
 	la $t6, MONSTER_3_1
 	add $t6, $t6, $s4
-	# move $t6, $s4 #monster 1
 	j check_mt
 c34:	li $a3, 35
 	la $t6, MONSTER_3_2
 	add $t6, $t6, $s4
-	#move $t6, $s5 #monster 2
 	j check_mt
 c35:	li $a3, 0
 	la $t6, MONSTER_3_3
 	add $t6, $t6, $s4
-	#move $t6, $s6 #monster 3
 	j check_mt
 
 #check movement type
