@@ -33,7 +33,7 @@
 .eqv	SPIKE_3_1	7964
 .eqv	SPIKE_3_2	7540
 
-.eqv	PLATFORM_1_1	14128
+.eqv	PLATFORM_1_1	14124
 .eqv	PLATFORM_1_2	13212
 .eqv	PLATFORM_2_1	13872
 .eqv	PLATFORM_2_2	12432
@@ -63,15 +63,16 @@
   # s6: clock counter
   # s7: level
   # t0: jump counter
+  # t8: previouse pressed key
  	
 reset:	li $s0, 3 # health
-	li $s7, 2 # level
+	li $s7, 1 # level
 
 next_level:
 	
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
- 	li $s3, 1 # double jump
+ 	li $s3, 2 # double jump
  	li $s4, 0 #0 to 40 range
  	li $s5, 0
  	li $t0, 0 # jump counter
@@ -419,6 +420,8 @@ jump_count:
 	beq $t0, 4, jump_5
 	j finish_check
 finished_check:
+	j jump_check
+jump_checked:
 	j wait
 	
 remove_player:
@@ -551,7 +554,6 @@ wait:
 
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
-	#beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
@@ -565,6 +567,8 @@ keypress_happened :
 	j wait
 
 respond_to_w:
+	beq $s3, 0, wait # jump not available
+	addi $s3, $s3, -1 #reduce jump
 	li $t0, 1
 	j jump_loop
 jump_2: li $t0, 2
@@ -603,6 +607,80 @@ right: 	addi $s1, $s1, 4 	# x+4
 	ble $s1, 236, paint_player
 	li $s1, 236 		# cap x >= 0
 	j paint_player
+	
+jump_check:
+	# player location
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
+jump_check_ground:
+	la $t6, GROUND
+    	li $t7, 0
+loop_jcg:
+	bge $t7, 64, end_loop_jcg
+	li $t5, 4	  # 4 bytes
+	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	add $t5, $t5, $t6 # t5 = address + offset
+	beq $t5, $a0 double_jump_reset
+    	addi $t7, $t7, 1
+    	j loop_jcg
+end_loop_jcg:
+	beq $s7, 1, jump_check_1
+	beq $s7, 2, jump_check_2
+	j jump_check_3
+jump_check_1:
+jc11:	li $a3, 12
+	la $t6, PLATFORM_1_1
+	j jump_check_patform
+jc12:	li $a3, 0
+	la $t6, PLATFORM_1_2
+	j jump_check_patform
+jump_check_2:
+jc21:	li $a3, 22
+	la $t6, PLATFORM_2_1 
+	j jump_check_patform
+jc22:	li $a3, 0
+	la $t6, PLATFORM_2_2
+	j jump_check_patform
+jump_check_3:
+jc31:	li $a3, 32
+	la $t6, PLATFORM_3_1 
+	j check_mtp
+jc32:	li $a3, 33
+	la $t6, PLATFORM_3_2
+	j jump_check_patform
+jc33:	li $a3, 34
+	la $t6, PLATFORM_3_3 
+	j jump_check_patform
+jc34:	li $t6, 35
+	la $a1, PLATFORM_3_4
+	j jump_check_patform
+jc35:	li $a3, 0
+	la $t6, PLATFORM_3_5 
+	j jump_check_patform
+jump_check_patform:
+	li $t7, 0 # init t7 = 0
+loop_jcp:
+	bge $t7, 15, end_loop_jcp
+	li $t5, 4	  # 4 bytes
+	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	add $t5, $t5, $t6 # t5 = address + offset
+	beq $t5, $a0 double_jump_reset
+    	addi $t7, $t7, 1
+    	j loop_jcp
+end_loop_jcp:
+	beq $a3, 12, jc12
+	beq $a3, 22, jc22
+	beq $a3, 32, jc32
+	beq $a3, 33, jc33
+	beq $a3, 34, jc34
+	beq $a3, 35, jc35
+	j jump_checked
+double_jump_reset:
+	li $s3, 2
+	j jump_checked
+
 
 finish_check:
 	# player location
