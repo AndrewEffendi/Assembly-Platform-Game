@@ -724,6 +724,7 @@ vertical_check:
 	li $t5, 0
 loop_vc:
 	bge $t5, 5, end_loop_vc
+	# here damage
 	beq $t6, $a0, wait
 	addi $t6, $t6, 256
     	addi $t5, $t5, 1
@@ -738,6 +739,7 @@ s_check:
 	bge $a0, $t6, cs
 	j s_check_next
 cs: 	addi $t6, $t6, 32
+	# here damage
 	ble $a0, $t6, wait
 s_check_next:
 	j collision_checked
@@ -781,6 +783,10 @@ end_r_p_3:
 	
 #p
 respond_to_p:
+	j remove_win
+removed_win:
+	j remove_lose
+removed_lose:
 	li $t8, 0x31 
 	j respond_to_1
 
@@ -805,7 +811,7 @@ end_r_p_4:
 
 #lose screen
 respond_to_l:
-	li $t8, 0x6b
+	li $t8, 0x6c
 	li $a3, 5
 	j remove_spike
 end_r_p_5:
@@ -814,24 +820,27 @@ end_r_p_5:
 
 #win
 win:	la $a1, COLOR_FINISH
+	li $a2, 11
 	j w_start
 remove_win:	
 	la $a1, COLOR_BLACK
+	li $a2, 12
 	j w_start
 w_start:
-	li $a2, 1
+	#li $a2, 12
 	li $t7, BASE_ADDRESS
 	addi $t7, $t7, 3920
 	j paint_you
 
 #lose screen
 lose:	la $a1, COLOR_RED
+	li $a2, 01
 	j l_start
 remove_lose:	
 	la $a1, COLOR_BLACK
+	li $a2, 02
 	j l_start
 l_start:
-	li $a2, 0
 	li $t7, BASE_ADDRESS
 	addi $t7, $t7, 3920
 	j paint_you
@@ -1018,6 +1027,7 @@ paint_lose:
 	sw $a1, 1804($t7)
 	sw $a1, 1808($t7)
 	sw $a1, 1812($t7)
+	beq $a2, 02, removed_lose
 	j end_screen
 	
 paint_win:
@@ -1164,6 +1174,7 @@ paint_win:
 	sw $a1, 1796($t7)
 	sw $a1, 1816($t7)
 	sw $a1, 1820($t7)
+	beq $a2, 12, removed_win
 	j end_screen
 	
 paint_you:
@@ -1294,5 +1305,6 @@ paint_you:
 	sw $a1, 1808($t7)
 	sw $a1, 1812($t7)
 
-	beqz $a2, paint_lose
+	beq $a2, 01, paint_lose
+	beq $a2, 02, paint_lose
 	j paint_win
