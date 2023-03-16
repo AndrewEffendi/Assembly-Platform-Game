@@ -53,7 +53,6 @@
 .eqv	HEALTH_3	576
  
 .text 
-	li $t0, BASE_ADDRESS # $t0 stores the base address for display 
  	
 reset:	li $s0, 5 # health
 	li $s7, 2 # level
@@ -84,7 +83,7 @@ ground:	la $a1, COLOR_GROUND
 paint_ground:
 	# $a0: position
 	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
     	li $t7, 0
 loop_ground:
 	bge $t7, 256, spike
@@ -132,7 +131,7 @@ paint_spike:
 	# $a1: colour
 	# $a2: next label
 	# $a3 remove calling level
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, 8($a0)
 	sw $a1, 256($a0)
 	sw $a1, 264($a0)
@@ -199,7 +198,7 @@ paint_platform:
 	# $a1: colour
 	# $a2: next label
 	# $a3 remove calling level
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
     	li $t7, 0 # init t7 = 0
 loop_platform:
 	bge $t7, 15, end_loop_p
@@ -256,7 +255,7 @@ paint_monster:
 	# $a0: position
 	# $a1: colour
 	# $a3 remove calling level
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -306,7 +305,7 @@ finish_lvl_3:
 paint_finish:
 	# $a0: position
 	# $a1: colour
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -330,7 +329,7 @@ paint_health:
 	# $a0: position
 	# $a1: colour
 	# $s2: next label
-	add $a0, $t0, $a0 # a0 = base + coordinate
+	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
 	sw $a1, 12($a0)
@@ -356,7 +355,7 @@ paint_player:
 	li $t7, 64 	  #t7 = 64
 	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
 	add $t7, $s1, $t7 #t7 = x + 64*y
-	add $t7, $t7, $t0
+	addi $t7, $t7, BASE_ADDRESS
 	la $a1, COLOR_RED
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
@@ -395,7 +394,7 @@ remove_player:
 	li $t7, 64 	  #t7 = 64
 	mul $t7, $t7, $s2 #t7 = 32*y
 	add $t7, $s1, $t7 #t7 = x + 32*y
-	add $t7, $t7, $t0 # t7 = base + offset
+	addi $t7, $t7, BASE_ADDRESS
 	la $a1, COLOR_BLACK
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
@@ -547,7 +546,7 @@ check_mtp:
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 32*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
 	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
@@ -568,7 +567,7 @@ sp_offset:
 	
 vertical_p_check:
 #$a0 player location + offset
-	add $t6, $t6, $t0
+	addi $t6, $t6, BASE_ADDRESS
 	li $t5, 0
 loop_vpc:
 	bge $t5, 9, end_loop_vpc
@@ -582,7 +581,7 @@ end_loop_vpc:
 sp_check:
 #$a0 player location + offset
 	addi $t6, $t6,-4 #shift left once
-	add $t6, $t6, $t0
+	addi $t6, $t6, BASE_ADDRESS
 	bge $a0, $t6, csp
 	j sp_check_next
 csp: 	addi $t6, $t6, 72
@@ -655,7 +654,7 @@ check_mt:
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 64*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
+	addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
 	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
 	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
@@ -672,7 +671,7 @@ s_offset:
 	
 vertical_check:
 #$a0 player location + offset
-	add $t6, $t6, $t0
+	addi $t6, $t6, BASE_ADDRESS
 	li $t5, 0
 loop_vc:
 	bge $t5, 5, end_loop_vc
@@ -686,7 +685,7 @@ end_loop_vc:
 s_check:
 #$a0 player location + offset
 	addi $t6, $t6,-4 #shift left once
-	add $t6, $t6, $t0
+	add $t6, $t6, BASE_ADDRESS
 	bge $a0, $t6, cs
 	j s_check_next
 cs: 	addi $t6, $t6, 32
@@ -756,13 +755,15 @@ end_r_p_5:
 #win
 win:	la $a1, COLOR_FINISH
 	li $a2, 1
-	addi $t7, $t0, 3920
+	li $t7, BASE_ADDRESS
+	addi $t7, $t7, 3920
 	j paint_you
 
 #lose screen
 lose:	la $a1, COLOR_RED
 	li $a2, 0
-	addi $t7, $t0, 3920
+	li $t7, BASE_ADDRESS
+	addi $t7, $t7, 3920
 	j paint_you
  	
 paint_lose:
