@@ -292,10 +292,9 @@ skip_paint_monster:
 	beq $a3, 4, end_r_p_4
 	beq $a3, 5, end_r_p_5
 	j finish
-
-move_monster_next:
-	la $t7, COLOR_BLACK
-	beq $a1, $t7 , remove_monster_done
+move_monster_next:	
+	la $t7, COLOR_BLACK	
+	beq $a1, $t7 , remove_monster_done	
 	j move_monster_done
 
 # finish line function
@@ -556,8 +555,7 @@ wait:
 	beq $t8, 1, keypress_happened 
 	
 	addi $s6, $s6, 1
-	beq $s6, 100, one_second #1 second
-one_second_done:	
+	beq $s6, 100, one_second #0.5 second
 	li $v0, 32 
 	li $a0, 10   # Wait 10 milliseconds 
 	syscall 
@@ -567,9 +565,26 @@ one_second:
 	li $s6, 0 # reset clock to 0
 	j remove_monster
 remove_monster_done: 
+	beqz $s4, set_monster_right
+	beq $s4, 40, set_monster_left
+	j set_monster_done
+set_monster_right:
+	li $s5, 0
+	j set_monster_done
+set_monster_left:
+	li $s5, 1
+	j set_monster_done
+set_monster_done:
+	beqz $s5, move_monster_right
+move_monster_left:
+	addi $s4, $s4, -4 #move monster left
+	j move_monster_right_done
+move_monster_right:
 	addi $s4, $s4, 4 #move monster right
+move_monster_right_done:
 	j monster
 move_monster_done:
+	li $s6, 1 # reset clock to 1
 	li $t8, 0x73
 	j respond_to_s #go down once
 
