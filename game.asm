@@ -631,33 +631,33 @@ end_loop_jcg:
 	j jump_check_3
 jump_check_1:
 jc11:	li $a3, 12
-	la $t6, PLATFORM_1_1
+	la $a1, PLATFORM_1_1
 	j jump_check_patform
 jc12:	li $a3, 0
-	la $t6, PLATFORM_1_2
+	la $a1, PLATFORM_1_2
 	j jump_check_patform
 jump_check_2:
 jc21:	li $a3, 22
-	la $t6, PLATFORM_2_1 
+	la $a1, PLATFORM_2_1 
 	j jump_check_patform
 jc22:	li $a3, 0
-	la $t6, PLATFORM_2_2
+	la $a1, PLATFORM_2_2
 	j jump_check_patform
 jump_check_3:
 jc31:	li $a3, 32
-	la $t6, PLATFORM_3_1 
+	la $a1, PLATFORM_3_1 
 	j jump_check_patform
 jc32:	li $a3, 33
-	la $t6, PLATFORM_3_2
+	la $a1, PLATFORM_3_2
 	j jump_check_patform
 jc33:	li $a3, 34
-	la $t6, PLATFORM_3_3 
+	la $a1, PLATFORM_3_3 
 	j jump_check_patform
 jc34:	li $a3, 35
-	la $t6, PLATFORM_3_4
+	la $a1, PLATFORM_3_4
 	j jump_check_patform
 jc35:	li $a3, 0
-	la $t6, PLATFORM_3_5 
+	la $a1, PLATFORM_3_5 
 	j jump_check_patform
 jump_check_patform:
 	li $t7, -2 # init t7 = 0
@@ -665,7 +665,7 @@ loop_jcp:
 	bge $t7, 17, end_loop_jcp
 	li $t5, 4	  # 4 bytes
 	mul $t5, $t5, $t7 # offset = 4 bytes * index
-	add $t5, $t5, $t6 # t5 = address + offset
+	add $t5, $t5, $a1 # t5 = address + offset
 	beq $t5, $a0 double_jump_reset
     	addi $t7, $t7, 1
     	j loop_jcp
