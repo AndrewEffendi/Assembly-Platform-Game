@@ -608,7 +608,7 @@ finish_check:
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 32*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
-	addi $a0, $a0, 2308 # 10 row down + 1 cell right
+	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
 	beq $s7, 1, finish_check_1
 	beq $s7, 2, finish_check_2
 	j finish_check_3
@@ -653,33 +653,33 @@ platform_check:
 #$a3, next label
 platform_check_1:
 p11:	li $a3, 12
-	la $t6, PLATFORM_1_1 
+	la $a1, PLATFORM_1_1 
 	j check_mtp
 p12:	li $a3, 0
-	la $t6, PLATFORM_1_2
+	la $a1, PLATFORM_1_2
 	j check_mtp
 platform_check_2:
 p21:	li $a3, 22
-	la $t6, PLATFORM_2_1 
+	la $a1, PLATFORM_2_1 
 	j check_mtp
 p22:	li $a3, 0
-	la $t6, PLATFORM_2_2
+	la $a1, PLATFORM_2_2
 	j check_mtp
 platform_check_3:
 p31:	li $a3, 32
-	la $t6, PLATFORM_3_1 
+	la $a1, PLATFORM_3_1 
 	j check_mtp
 p32:	li $a3, 33
-	la $t6, PLATFORM_3_2
+	la $a1, PLATFORM_3_2
 	j check_mtp
 p33:	li $a3, 34
-	la $t6, PLATFORM_3_3 
+	la $a1, PLATFORM_3_3 
 	j check_mtp
 p34:	li $a3, 35
-	la $t6, PLATFORM_3_4
+	la $a1, PLATFORM_3_4
 	j check_mtp
 p35:	li $a3, 0
-	la $t6, PLATFORM_3_5 
+	la $a1, PLATFORM_3_5 
 	j check_mtp
 
 check_mtp:
@@ -707,12 +707,12 @@ sp_offset:
 	
 vertical_p_check:
 #$a0 player location + offset
-	addi $t6, $t6, BASE_ADDRESS
+	addi $a1, $a1, BASE_ADDRESS
 	li $t5, 0
 loop_vpc:
 	bge $t5, 9, end_loop_vpc
-	beq $t6, $a0, wait
-	addi $t6, $t6, 256
+	beq $a1, $a0, wait
+	addi $a1, $a1, 256
     	addi $t5, $t5, 1
     	j loop_vpc
 end_loop_vpc:
@@ -720,16 +720,17 @@ end_loop_vpc:
 
 sp_check:
 #$a0 player location + offset
-	addi $t6, $t6,-4 #shift left once
-	addi $t6, $t6, BASE_ADDRESS
-	bge $a0, $t6, csp
+	addi $a1, $a1,-4 #shift left once
+	addi $a1, $a1, BASE_ADDRESS
+	bge $a0, $a1, csp
 	j sp_check_next
-csp: 	addi $t6, $t6, 72
-	ble $a0, $t6, wait
+csp: 	addi $a1, $a1, 72
+	ble $a0, $a1, wait
 sp_check_next:
 	j platform_checked
 	
 platform_checked:
+	# a3 next label
 	beq $a3, 12, p12
 	beq $a3, 22, p22
 	beq $a3, 32, p32
@@ -749,49 +750,49 @@ collision_check:
 # check collission for lvl 1
 collision_check_1:
 c11:	li $a3, 12
-	la $t6, SPIKE_1_1 
+	la $a1, SPIKE_1_1 
 	j check_mt
 c12:	li $a3, 13
-	la $t6, SPIKE_1_2
+	la $a1, SPIKE_1_2
 	j check_mt
 c13:	li $a3, 0
-	la $t6, SPIKE_1_3
+	la $a1, SPIKE_1_3
 	j check_mt
 #check collision for level 2
 collision_check_2:
 c21:	li $a3, 22
-	la $t6, SPIKE_2_1 
+	la $a1, SPIKE_2_1 
 	j check_mt
 c22:	li $a3, 23
-	la $t6, SPIKE_2_2
+	la $a1, SPIKE_2_2
 	j check_mt
 c23:	li $a3, 24
-	la $t6, MONSTER_2_1
-	add $t6, $t6, $s4
+	la $a1, MONSTER_2_1
+	add $a1, $a1, $s4
 	j check_mt
 c24:	li $a3, 0
-	la $t6, MONSTER_2_2
-	add $t6, $t6, $s4
+	la $a1, MONSTER_2_2
+	add $a1, $a1, $s4
 	j check_mt
 #check collision for level 3
 collision_check_3:
 c31:	li $a3, 32
-	la $t6, SPIKE_3_1 
+	la $a1, SPIKE_3_1 
 	j check_mt
 c32:	li $a3, 33
-	la $t6, SPIKE_3_2
+	la $a1, SPIKE_3_2
 	j check_mt
 c33:	li $a3, 34
-	la $t6, MONSTER_3_1
-	add $t6, $t6, $s4
+	la $a1, MONSTER_3_1
+	add $a1, $a1, $s4
 	j check_mt
 c34:	li $a3, 35
-	la $t6, MONSTER_3_2
-	add $t6, $t6, $s4
+	la $a1, MONSTER_3_2
+	add $a1, $a1, $s4
 	j check_mt
 c35:	li $a3, 0
-	la $t6, MONSTER_3_3
-	add $t6, $t6, $s4
+	la $a1, MONSTER_3_3
+	add $a1, $a1, $s4
 	j check_mt
 
 #check movement type
@@ -816,13 +817,13 @@ s_offset:
 	
 vertical_check:
 #$a0 player location + offset
-	addi $t6, $t6, BASE_ADDRESS
+	addi $a1, $a1, BASE_ADDRESS
 	li $t5, 0
 loop_vc:
 	bge $t5, 5, end_loop_vc
 	# here damage
-	beq $t6, $a0, damaged
-	addi $t6, $t6, 256
+	beq $a1, $a0, damaged
+	addi $a1, $a1, 256
     	addi $t5, $t5, 1
     	j loop_vc
 end_loop_vc:
@@ -830,13 +831,13 @@ end_loop_vc:
 	
 s_check:
 #$a0 player location + offset
-	addi $t6, $t6,-4 #shift left once
-	add $t6, $t6, BASE_ADDRESS
-	bge $a0, $t6, cs
+	addi $a1, $a1,-4 #shift left once
+	add $a1, $a1, BASE_ADDRESS
+	bge $a0, $a1, cs
 	j s_check_next
-cs: 	addi $t6, $t6, 32
+cs: 	addi $a1, $a1, 32
 	# here damage
-	ble $a0, $t6, damaged
+	ble $a0, $a1, damaged
 s_check_next:
 	j collision_checked
 
@@ -895,7 +896,6 @@ Exit:
  	syscall 
 end_screen:
 	li $t9, 0xffff0000  
-	#lw $t8, 0($t9) 
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j end_screen
