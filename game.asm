@@ -508,25 +508,45 @@ right: 	addi $s1, $s1, 4 	# x+4
 	j paint_player
 
 finish_check:
-	beq $s7, 1, finish_check_1
-	#beq $s7, 2, finish_check_2
-	#j finish_check_3
-	j finished_check
-finish_check_1:
-	#li $t6, FINISH_1
 	# player location
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 32*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
-	#addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
 	addi $a0, $a0, 2308 # 10 row down + 1 cell right
+	beq $s7, 1, finish_check_1
+	beq $s7, 2, finish_check_2
+	j finish_check_3
+	j finished_check
+finish_check_1:
 	li $t6, FINISH_1
-	#addi $t6, $t6, BASE_ADDRESS
+	beq $a0, $t6, respond_to_2
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_2
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_2
+	addi $t6, $t6, 4
 	beq $a0, $t6, respond_to_2
 	j finished_check
-	#j jump_count
 finish_check_2:
+	li $t6, FINISH_2
+	beq $a0, $t6, respond_to_3
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_3
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_3
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_3
+	j finished_check
 finish_check_3:
+	li $t6, FINISH_3
+	beq $a0, $t6, respond_to_k
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_k
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_k
+	addi $t6, $t6, 4
+	beq $a0, $t6, respond_to_k
+	j finished_check
 
 
 
@@ -767,9 +787,16 @@ respond_to_p:
 Exit:
  	li $v0, 10 # terminate the program gracefully 
  	syscall 
+end_screen:
+	li $t9, 0xffff0000  
+	#lw $t8, 0($t9) 
+	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
+	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
+	j end_screen
 
 #win screen
 respond_to_k:
+	li $t8, 0x6b
 	li $a3, 4
 	j remove_spike
 end_r_p_4:
@@ -778,6 +805,7 @@ end_r_p_4:
 
 #lose screen
 respond_to_l:
+	li $t8, 0x6b
 	li $a3, 5
 	j remove_spike
 end_r_p_5:
@@ -786,6 +814,11 @@ end_r_p_5:
 
 #win
 win:	la $a1, COLOR_FINISH
+	j w_start
+remove_win:	
+	la $a1, COLOR_BLACK
+	j w_start
+w_start:
 	li $a2, 1
 	li $t7, BASE_ADDRESS
 	addi $t7, $t7, 3920
@@ -793,6 +826,11 @@ win:	la $a1, COLOR_FINISH
 
 #lose screen
 lose:	la $a1, COLOR_RED
+	j l_start
+remove_lose:	
+	la $a1, COLOR_BLACK
+	j l_start
+l_start:
 	li $a2, 0
 	li $t7, BASE_ADDRESS
 	addi $t7, $t7, 3920
@@ -883,7 +921,7 @@ paint_lose:
 	sw $a1, 1808($t7)
 	sw $a1, 1812($t7)
 	
-	#place holder
+	#S
 	addi $t7, $t7, 32
 	sw $a1,($t7)
 	sw $a1, 4($t7)
@@ -980,7 +1018,7 @@ paint_lose:
 	sw $a1, 1804($t7)
 	sw $a1, 1808($t7)
 	sw $a1, 1812($t7)
-	j Exit
+	j end_screen
 	
 paint_win:
 	#W
@@ -1126,7 +1164,7 @@ paint_win:
 	sw $a1, 1796($t7)
 	sw $a1, 1816($t7)
 	sw $a1, 1820($t7)
-	j Exit
+	j end_screen
 	
 paint_you:
 	# paint Y
