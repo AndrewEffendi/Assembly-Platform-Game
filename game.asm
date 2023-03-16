@@ -552,7 +552,7 @@ wait:
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
 	#beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
-	beq $t8, 0x77, jump_1   # ASCII code of 'w' is 0x77 
+	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
 	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
@@ -564,17 +564,18 @@ keypress_happened :
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j wait
 
-jump_1: li $t0, 1
-	j respond_to_w
-jump_2: li $t0, 2
-	j respond_to_w
-jump_3: li $t0, 3
-	j respond_to_w
-jump_4: li $t0, 4
-	j respond_to_w
-jump_5: li $t0, 0
-	j respond_to_w
 respond_to_w:
+	li $t0, 1
+	j jump_loop
+jump_2: li $t0, 2
+	j jump_loop
+jump_3: li $t0, 3
+	j jump_loop
+jump_4: li $t0, 4
+	j jump_loop
+jump_5: li $t0, 0
+	j jump_loop
+jump_loop:
 	j collision_check
 jump:	addi $s2, $s2, -4 	# y-1
 	bge $s2, 40, paint_player
