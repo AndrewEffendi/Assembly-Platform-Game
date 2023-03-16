@@ -389,10 +389,6 @@ paint_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
-	beq $s3, 1, jump_2
-	beq $s3, 2, jump_3
-	beq $s3, 3, jump_4
-	beq $s3, 4, jump_5
 	j wait
 	
 remove_player:
@@ -439,6 +435,14 @@ remove_player:
 	beq $t8, 0x33, next_level   # ASCII code of '33' is 0x64
 	beq $t8, 0x6b, win   # ASCII code of 'k' is 0x6b
 	beq $t8, 0x6c, lose   # ASCII code of 'l' is 0x6c
+	
+jump_count:
+	beq $s3, 0, jump_1
+	beq $s3, 1, jump_2
+	beq $s3, 2, jump_3
+	beq $s3, 3, jump_4
+	beq $s3, 4, jump_5
+	
  
 wait:
  	li $t9, 0xffff0000  
@@ -460,9 +464,6 @@ keypress_happened :
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j wait
 
-respond_to_w:
-	j collision_check
-	#j remove_player
 jump_1: li $s3, 1
 	j jump
 jump_2: li $s3, 2
@@ -473,6 +474,8 @@ jump_4: li $s3, 4
 	j jump
 jump_5: li $s3, 5
 	j jump
+respond_to_w:
+	j collision_check
 jump:	addi $s2, $s2, -4 	# y-1
 	bge $s2, 40, paint_player
 	li $s2, 40 		# cap y >= 40
@@ -537,42 +540,25 @@ p35:	li $a3, 0
 	j check_mtp
 
 check_mtp:
-	#remove
-	#j remove_player
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
 	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
 	j dp_offset
 wp_offset:
-	#TODO
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, -244  	#t7 + 8 row below + 5 cell righ
 	j sp_check
 
 ap_offset:
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 64*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 1988  	#t7 + 8 row below + 5 cell left
 	j vertical_p_check
 dp_offset:
-	#modularize
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 64*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
 	j vertical_p_check
 sp_offset:
-	#modularize
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
 	j sp_check
 	
@@ -662,31 +648,21 @@ c35:	li $a3, 0
 
 #check movement type
 check_mt:
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 64*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	add $a0, $a0, $t0 	# t7 = base + offset
 	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
 	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
 	j platform_check
 a_offset:
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 64*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2028  	#t7 + 8 row below + 5 cell left
 	j vertical_check
 d_offset:
-	#modularize
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 64*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
 	j vertical_check
 s_offset:
-	#modularize
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	add $a0, $a0, $t0 	# t7 = base + offset
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
 	j s_check
 	
