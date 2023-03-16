@@ -52,7 +52,17 @@
 .eqv	HEALTH_2	548
 .eqv	HEALTH_3	576
  
-.text 
+.text
+
+  # s0: health
+  # s1: x coordinate
+  # s2: y coordinate
+  # s3: double jump  
+  # s4: enemy location
+  # s5: enemy direction
+  # s6: clock counter
+  # s7: level
+  # t0: jump counter
  	
 reset:	li $s0, 5 # health
 	li $s7, 2 # level
@@ -61,20 +71,10 @@ next_level:
 	
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
- 	
- 	li $s3, 0 # double jump
-	
-	
-monster_initial_pos:
-	beq $s7, 3, mpos_lvl_3
- mpos_lvl_1: # no monster
- mpos_lvl_2:
- 	li $s4, 14108 # enemy 1
- 	li $s5, 12592 # enemy 2
- mpos_lvl_3:
- 	li $s4, 14108 # enemy 1
- 	li $s5, 12612 # enemy 2
- 	li $s6, 9408 # enemy 3
+ 	li $s3, 1 # double jump
+ 	li $s4, 0 #0 to 40 range
+ 	li $s5, 0
+ 	li $t0, 0 # jump counter
 
 # ground function
 ground:	la $a1, COLOR_GROUND
@@ -231,25 +231,30 @@ monster_lvl_1:
 	j skip_paint_monster # no monster for level 1
 monster_lvl_2:
 	la $a2, 22
-	#la $a0, MONSTER_2_1
-	move $a0, $s4
+	la $a0, MONSTER_2_1
+	add $a0, $a0, $s4
+	#move $a0, $s4
 	j paint_monster
 m_2_2:	li $a2, 0
-	#la $a0, MONSTER_2_2
-	move $a0, $s5
+	la $a0, MONSTER_2_2
+	add $a0, $a0, $s4
+	#move $a0, $s5
 	j paint_monster
 monster_lvl_3:
 	li $a2, 32
-	#la $a0, MONSTER_3_1
-	move $a0, $s4
+	la $a0, MONSTER_3_1
+	add $a0, $a0, $s4
+	#move $a0, $s4
 	j paint_monster
 m_3_2:	li $a2, 33
-	#la $a0, MONSTER_3_2
-	move $a0, $s5
+	la $a0, MONSTER_3_2
+	add $a0, $a0, $s4
+	#move $a0, $s5
 	j paint_monster
 m_3_3:	li $a2, 0
-	#la $a0, MONSTER_3_3
-	move $a0, $s6
+	la $a0, MONSTER_3_3
+	add $a0, $a0, $s4
+	#move $a0, $s6
 	j paint_monster
 paint_monster:
 	# $a0: position
@@ -626,10 +631,14 @@ c22:	li $a3, 23
 	la $t6, SPIKE_2_2
 	j check_mt
 c23:	li $a3, 24
-	move $t6, $s4 #monster 1
+	la $t6, MONSTER_2_1
+	add $t6, $t6, $s4
+	#move $t6, $s4 #monster 1
 	j check_mt
 c24:	li $a3, 0
-	move $t6, $s5 #monster 2
+	la $t6, MONSTER_2_2
+	add $t6, $t6, $s4
+	#move $t6, $s5 #monster 2
 	j check_mt
 #check collision for level 3
 collision_check_3:
@@ -640,13 +649,19 @@ c32:	li $a3, 33
 	la $t6, SPIKE_3_2
 	j check_mt
 c33:	li $a3, 34
-	move $t6, $s4 #monster 1
+	la $t6, MONSTER_3_1
+	add $t6, $t6, $s4
+	# move $t6, $s4 #monster 1
 	j check_mt
 c34:	li $a3, 35
-	move $t6, $s5 #monster 2
+	la $t6, MONSTER_3_2
+	add $t6, $t6, $s4
+	#move $t6, $s5 #monster 2
 	j check_mt
 c35:	li $a3, 0
-	move $t6, $s6 #monster 3
+	la $t6, MONSTER_3_3
+	add $t6, $t6, $s4
+	#move $t6, $s6 #monster 3
 	j check_mt
 
 #check movement type
