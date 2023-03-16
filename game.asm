@@ -33,7 +33,7 @@
 .eqv	SPIKE_3_1	7964
 .eqv	SPIKE_3_2	7540
 
-.eqv	PLATFORM_1_1	14124
+.eqv	PLATFORM_1_1	13868
 .eqv	PLATFORM_1_2	13212
 .eqv	PLATFORM_2_1	13872
 .eqv	PLATFORM_2_2	12432
@@ -73,7 +73,7 @@ next_level:
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
  	li $s3, 2 # double jump
- 	li $s4, 0 #0 to 40 range
+ 	li $s4, 20 #0 to 40 range
  	li $s5, 0
  	li $t0, 0 # jump counter
 
@@ -420,7 +420,7 @@ jump_count:
 	beq $t0, 4, jump_5
 	j finish_check
 finished_check:
-	j jump_check
+	bne $t8 0x77, jump_check # w
 jump_checked:
 	j wait
 	
@@ -646,23 +646,23 @@ jc22:	li $a3, 0
 jump_check_3:
 jc31:	li $a3, 32
 	la $t6, PLATFORM_3_1 
-	j check_mtp
+	j jump_check_patform
 jc32:	li $a3, 33
 	la $t6, PLATFORM_3_2
 	j jump_check_patform
 jc33:	li $a3, 34
 	la $t6, PLATFORM_3_3 
 	j jump_check_patform
-jc34:	li $t6, 35
-	la $a1, PLATFORM_3_4
+jc34:	li $a3, 35
+	la $t6, PLATFORM_3_4
 	j jump_check_patform
 jc35:	li $a3, 0
 	la $t6, PLATFORM_3_5 
 	j jump_check_patform
 jump_check_patform:
-	li $t7, 0 # init t7 = 0
+	li $t7, -2 # init t7 = 0
 loop_jcp:
-	bge $t7, 15, end_loop_jcp
+	bge $t7, 17, end_loop_jcp
 	li $t5, 4	  # 4 bytes
 	mul $t5, $t5, $t7 # offset = 4 bytes * index
 	add $t5, $t5, $t6 # t5 = address + offset
