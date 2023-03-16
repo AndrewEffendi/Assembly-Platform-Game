@@ -372,13 +372,13 @@ paint_health:
 	j player
 	
 # player function
-# $a1 color #a2 loop jump	
+# $a1 color 	
 player:
 	j paint_player
 paint_player:
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
-	add $t7, $s1, $t7 #t7 = x + 64*y
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 64*y
 	addi $t7, $t7, BASE_ADDRESS
 	la $a1, COLOR_RED
 	sw $a1, 4($t7)
@@ -422,9 +422,9 @@ finished_check:
 	j wait
 	
 remove_player:
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 32*y
-	add $t7, $s1, $t7 #t7 = x + 32*y
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 32*y
+	add $t7, $s1, $t7 	#t7 = x + 32*y
 	addi $t7, $t7, BASE_ADDRESS
 	la $a1, COLOR_BLACK
 	sw $a1, 4($t7)
@@ -456,20 +456,20 @@ remove_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
-	beq $t8, 0x77, jump   	# ASCII code of 'w' is 0x77 
-	beq $t8, 0x61, left   	# ASCII code of 'a' is 0x61
-	beq $t8, 0x73, gravity  # ASCII code of 's' is 0x73 
-	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
-	beq $t8, 0x31, next_level   # ASCII code of '31' is 0x64
-	beq $t8, 0x32, next_level   # ASCII code of '32' is 0x64
-	beq $t8, 0x33, next_level   # ASCII code of '33' is 0x64
-	beq $t8, 0x6b, win   # ASCII code of 'k' is 0x6b
-	beq $t8, 0x6c, lose   # ASCII code of 'l' is 0x6c
+	beq $t8, 0x77, jump   		# ASCII code of 'w' is 0x77 
+	beq $t8, 0x61, left   		# ASCII code of 'a' is 0x61
+	beq $t8, 0x73, gravity  	# ASCII code of 's' is 0x73 
+	beq $t8, 0x64, right   		# ASCII code of 'd' is 0x64
+	beq $t8, 0x31, next_level   	# ASCII code of '31' is 0x64
+	beq $t8, 0x32, next_level  	# ASCII code of '32' is 0x64
+	beq $t8, 0x33, next_level   	# ASCII code of '33' is 0x64
+	beq $t8, 0x6b, win   		# ASCII code of 'k' is 0x6b
+	beq $t8, 0x6c, lose   		# ASCII code of 'l' is 0x6c
 
 damage_player:
-	li $t7, 64 	  #t7 = 64
-	mul $t7, $t7, $s2 #t7 = 256/64*y = 64*y
-	add $t7, $s1, $t7 #t7 = x + 64*y
+	li $t7, 64 	  	#t7 = 64
+	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
+	add $t7, $s1, $t7 	#t7 = x + 64*y
 	addi $t7, $t7, BASE_ADDRESS
 	la $a1, COLOR_RED
 	sw $a1, 4($t7)
@@ -502,7 +502,7 @@ damage_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
 	li $v0, 32 
-	li $a0, 100   # Wait one second (100 milliseconds) 
+	li $a0, 100   # Wait 100 milliseconds 
 	syscall 
 	la $a1, COLOR_RED
 	sw $a1, 4($t7)
@@ -545,7 +545,7 @@ wait:
 	beq $t8, 1, keypress_happened 
 	
 	li $v0, 32 
-	li $a0, 10   # Wait one second (40 milliseconds) 
+	li $a0, 10   # Wait 40 milliseconds 
 	syscall 
 	j wait
 
