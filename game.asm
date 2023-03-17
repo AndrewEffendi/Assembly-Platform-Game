@@ -576,17 +576,19 @@ set_monster_left:
 	j set_monster_done
 set_monster_done:
 	beqz $s5, move_monster_right
+	j move_monster_left
 move_monster_left:
 	addi $s4, $s4, -4 #move monster left
-	j move_monster_right_done
+	j monster
 move_monster_right:
 	addi $s4, $s4, 4 #move monster right
-move_monster_right_done:
 	j monster
 move_monster_done:
 	li $s6, 1 # reset clock to 1
 	li $t8, 0x73
 	j respond_to_s #go down once
+
+check_move_monster_left:
 
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
