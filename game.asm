@@ -284,13 +284,13 @@ paint_monster:
 	beq $a2, 32, m_3_2
 	beq $a2, 33, m_3_3
 skip_paint_monster:
-	# move monster
-	beqz $s6, move_monster_next
 	beq $a3, 1, end_r_p_1
 	beq $a3, 2, end_r_p_2
 	beq $a3, 3, end_r_p_3
 	beq $a3, 4, end_r_p_4
 	beq $a3, 5, end_r_p_5
+	# move monster
+	beqz $s6, move_monster_next
 	j finish
 move_monster_next:	
 	la $t7, COLOR_BLACK	
@@ -563,6 +563,7 @@ wait:
 	j wait
 
 one_second:
+	li $s6, 0 # reset clock to 0
 	beqz $s4, set_monster_right
 	beq $s4, 40, set_monster_left
 	j set_monster_done
@@ -576,7 +577,7 @@ set_monster_done:
 	beqz $s5, check_move_monster_right
 	j check_move_monster_left
 update_monster:
-	li $s6, 0 # reset clock to 0
+	li $a3, 0 # not type end_r_p
 	j remove_monster
 remove_monster_done:
 	beqz $s5, move_monster_right
