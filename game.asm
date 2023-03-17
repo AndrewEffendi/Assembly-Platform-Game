@@ -574,8 +574,7 @@ set_monster_left:
 	li $s5, 1
 	j set_monster_done
 set_monster_done:
-	beqz $s5, check_move_monster_right
-	j check_move_monster_left
+	j check_move_monster
 update_monster:
 	li $a3, 0 # not type end_r_p
 	j remove_monster
@@ -593,14 +592,18 @@ move_monster_done:
 	li $t8, 0x73
 	j respond_to_s #go down once
 
-check_move_monster_left:
+check_move_monster:
 	# player location
 	li $a0, 64 	  	#t7 = 64
 	mul $a0, $a0, $s2 	#t7 = 32*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
+	beqz $s5, check_move_monster_right
+	j check_move_monster_left
+check_move_monster_left:
 	addi $a0, $a0, 1040 	# 4 row down + 4 cell right
+	#addi $a1, $s4, -4 #move monster left
 	beq $s7, 2, monster_left_check_2
-	#beq $s7, 3, monster_left_check_3
+	beq $s7, 3, monster_left_check_3
 	j update_monster
 monster_left_check_2:
 ml21:	li $a3, 22
@@ -610,11 +613,30 @@ ml22:	li $a3, 0
 	la $a1, MONSTER_2_2
 	j check_ml
 monster_left_check_3:
-
+ml31:	li $a3, 32
+	la $a1, MONSTER_3_1
+	j check_ml
+ml32:	li $a3, 33
+	la $a1, MONSTER_3_2
+	j check_ml
+ml33:	li $a3, 0
+	la $a1, MONSTER_3_3
+	j check_ml
 check_ml:
 	add $a1, $a1, $s4
 	addi $a1, $a1, -4 #move monster left
 	beq $a0, $a1, remove_health
+	addi $a1, $a1, -256 #move monster up
+	beq $a0, $a1, remove_health
+	addi $a1, $a1, -256 #move monster up
+	beq $a0, $a1, remove_health
+	addi $a1, $a1, -256 #move monster up
+	beq $a0, $a1, remove_health
+	addi $a1, $a1, -256 #move monster up
+	beq $a0, $a1, remove_health
+	beq $a3, 22, ml22
+	beq $a3, 32, ml32
+	beq $a3, 33, ml33
 	j update_monster
 	
 check_move_monster_right:
