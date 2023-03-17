@@ -1081,28 +1081,30 @@ end_r_p_5:
 #win
 win:	la $a1, COLOR_FINISH
 	li $a2, 11
-	j w_start
+	j wl_start
 remove_win:	
 	la $a1, COLOR_BLACK
 	li $a2, 12
-	j w_start
-w_start:
-	li $a0, BASE_ADDRESS
-	addi $a0, $a0, 3920
-	j paint_you
-
-#lose screen
+	j wl_start
+#lose
 lose:	la $a1, COLOR_RED
 	li $a2, 01
-	j l_start
+	j wl_start
 remove_lose:	
 	la $a1, COLOR_BLACK
 	li $a2, 02
-	j l_start
-l_start:
+	j wl_start
+wl_start:
 	li $a0, BASE_ADDRESS
 	addi $a0, $a0, 3920
 	j paint_you
+	
+press_p_to_restart:
+	addi $a0, $a0, 4400
+	sw $a1,($a0)
+	beq $a2, 02, removed_lose
+	beq $a2, 12, removed_win
+	j end_screen
  	
 paint_lose:
 	# paint 'L'
@@ -1255,8 +1257,7 @@ paint_lose:
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-	beq $a2, 02, removed_lose
-	j end_screen
+	j press_p_to_restart
 	
 paint_win:
 	# paint 'W'
@@ -1376,8 +1377,7 @@ paint_win:
 	sw $a1, 1796($a0)
 	sw $a1, 1816($a0)
 	sw $a1, 1820($a0)
-	beq $a2, 12, removed_win
-	j end_screen
+	j press_p_to_restart
 	
 paint_you:
 	# paint 'Y'
