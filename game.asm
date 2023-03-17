@@ -342,6 +342,7 @@ removed_health:
 player_damaged:
 	addi $s0, $s0, -1 #ewduced health by 1
 	beqz $s0, respond_to_l # if no heart lose
+	beqz $s6, move_monster_done
 	j wait
 
 health:	la, $a1, COLOR_HEALTH
@@ -562,9 +563,6 @@ wait:
 	j wait
 
 one_second:
-	li $s6, 0 # reset clock to 0
-	j remove_monster
-remove_monster_done: 
 	beqz $s4, set_monster_right
 	beq $s4, 40, set_monster_left
 	j set_monster_done
@@ -575,8 +573,14 @@ set_monster_left:
 	li $s5, 1
 	j set_monster_done
 set_monster_done:
+	beqz $s5, check_move_monster_right
+	j check_move_monster_left
+update_monster:
+	li $s6, 0 # reset clock to 0
+	j remove_monster
+remove_monster_done:
 	beqz $s5, move_monster_right
-	j move_monster_left
+	j move_monster_left 
 move_monster_left:
 	addi $s4, $s4, -4 #move monster left
 	j monster
@@ -589,7 +593,35 @@ move_monster_done:
 	j respond_to_s #go down once
 
 check_move_monster_left:
+	# player location
+	li $a0, 64 	  	#t7 = 64
+	mul $a0, $a0, $s2 	#t7 = 32*y
+	add $a0, $s1, $a0 	#t7 = x + 32*y
+	addi $a0, $a0, 1040 	# 4 row down + 4 cell right
+	beq $s7, 2, monster_left_check_2
+	#beq $s7, 3, monster_left_check_3
+	j update_monster
+monster_left_check_2:
+ml21:	li $a3, 22
+	la $a1, MONSTER_2_1
+	j check_ml
+ml22:	li $a3, 0
+	la $a1, MONSTER_2_2
+	j check_ml
+monster_left_check_3:
 
+check_ml:
+	add $a1, $a1, $s4
+	addi $a1, $a1, -4 #move monster left
+	beq $a0, $a1, remove_health
+	j update_monster
+	
+check_move_monster_right:
+	j update_monster
+	
+	
+	
+	
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
 	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
