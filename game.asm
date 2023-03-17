@@ -69,13 +69,12 @@ reset:	li $s0, 3 # health
 	li $s7, 1 # level
 
 next_level:
-	
  	li $s1, 0 # player's x-coordinate
  	li $s2, 204 # player's y-coordinate
  	li $s3, 2 # double jump
- 	li $s4, 0 #0 to 40 range
- 	li $s5, 0
- 	li $s6, 1 # reset clock to 0
+ 	li $s4, 0 # 0 to 40 range
+ 	li $s5, 0 # 0 right, 1 left
+ 	li $s6, 1 # reset clock to 1
  	li $t0, 0 # jump counter
 
 # ground function
@@ -329,7 +328,6 @@ remove_health:
 	beq $s0, 3, rh_3
 	beq $s0, 2, rh_2
 	beq $s0, 1, rh_1
-	#remove
 	j respond_to_l
 rh_3:	la, $a0, HEALTH_3
 	j paint_health
@@ -340,8 +338,8 @@ rh_1:	la, $a0, HEALTH_1
 removed_health:
 	j damage_player
 player_damaged:
-	addi $s0, $s0, -1 #ewduced health by 1
-	beqz $s0, respond_to_l # if no heart lose
+	addi $s0, $s0, -1 	# reduced health by 1
+	beqz $s0, respond_to_l 	# if 0 heart, lose
 	beqz $s6, move_monster_done
 	j wait
 
@@ -549,20 +547,19 @@ damage_player:
 	sw $a1, 1804($t7) 
 	j player_damaged
 	
- 
 wait:
  	li $t9, 0xffff0000  
 	lw $t8, 0($t9) 
 	beq $t8, 1, keypress_happened 
 	
 	addi $s6, $s6, 1
-	beq $s6, 50, one_second #0.5 second
+	beq $s6, 50, wait_second #0.5 second
 	li $v0, 32 
 	li $a0, 10   # Wait 10 milliseconds 
 	syscall 
 	j wait
 
-one_second:
+wait_second:
 	li $s6, 0 # reset clock to 0
 	beqz $s4, set_monster_right
 	beq $s4, 40, set_monster_left
@@ -641,9 +638,6 @@ check_mm:
 	beq $a3, 32, ml32
 	beq $a3, 33, ml33
 	j update_monster
-	
-	
-	
 	
 keypress_happened :	
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
@@ -774,7 +768,6 @@ double_jump_reset:
 	li $s3, 2
 	j jump_checked
 
-
 finish_check:
 	# player location
 	li $a0, 64 	  	#t7 = 64
@@ -815,8 +808,6 @@ finish_check_3:
 	addi $t6, $t6, 4
 	beq $a0, $t6, respond_to_k
 	j finished_check
-
-
 
 platform_check:
 	beq $s7, 1, platform_check_1
@@ -910,9 +901,6 @@ platform_checked:
 	beq $a3, 34, p34
 	beq $a3, 35, p35
 	j remove_player
-	
-	
-	
 	
 collision_check:
 	beq $s7, 1, collision_check_1
@@ -1117,41 +1105,33 @@ l_start:
 	j paint_you
  	
 paint_lose:
-	# L
+	# paint 'L'
 	addi $a0, $a0, 2480
 	sw $a1,($a0)
 	sw $a1, 4($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-	
-	#paint O
+	# paint 'O'
 	addi $a0, $a0, 32
 	sw $a1,($a0)
 	sw $a1, 4($a0)
@@ -1159,49 +1139,41 @@ paint_lose:
 	sw $a1, 12($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
 	sw $a1, 268($a0)
 	sw $a1, 272($a0)
 	sw $a1, 276($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 528($a0)
 	sw $a1, 532($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 784($a0)
 	sw $a1, 788($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-	
-	#S
+	# paint 'S'
 	addi $a0, $a0, 32
 	sw $a1,($a0)
 	sw $a1, 4($a0)
@@ -1209,47 +1181,39 @@ paint_lose:
 	sw $a1, 12($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
 	sw $a1, 268($a0)
 	sw $a1, 272($a0)
 	sw $a1, 276($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 776($a0)
 	sw $a1, 780($a0)
 	sw $a1, 784($a0)
-	
 	sw $a1, 1028($a0)
 	sw $a1, 1032($a0)
 	sw $a1, 1036($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
-	
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-	
-	# E
+	# paint 'E'
 	addi $a0, $a0, 32
 	sw $a1,($a0)
 	sw $a1, 4($a0)
@@ -1257,41 +1221,34 @@ paint_lose:
 	sw $a1, 12($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
 	sw $a1, 268($a0)
 	sw $a1, 272($a0)
 	sw $a1, 276($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 776($a0)
 	sw $a1, 780($a0)
 	sw $a1, 784($a0)
 	sw $a1, 788($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1032($a0)
 	sw $a1, 1036($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
@@ -1302,46 +1259,38 @@ paint_lose:
 	j end_screen
 	
 paint_win:
-	#W
+	# paint 'W'
 	addi $a0, $a0, 2492
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 32($a0)
 	sw $a1, 36($a0)
-	
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 288($a0)
 	sw $a1, 292($a0)
-
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 544($a0)
 	sw $a1, 548($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 784($a0)
 	sw $a1, 788($a0)	
 	sw $a1, 800($a0)
 	sw $a1, 804($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
 	sw $a1, 1056($a0)
 	sw $a1, 1060($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
 	sw $a1, 1312($a0)
 	sw $a1, 1316($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
@@ -1352,7 +1301,6 @@ paint_win:
 	sw $a1, 1564($a0)
 	sw $a1, 1568($a0)
 	sw $a1, 1572($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
@@ -1363,54 +1311,42 @@ paint_win:
 	sw $a1, 1820($a0)
 	sw $a1, 1824($a0)
 	sw $a1, 1828($a0)
-	
-	#place I
+	# paint 'I'
 	addi $a0, $a0, 48
 	sw $a1,($a0)
 	sw $a1, 4($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
-	
-	#N
+	# paint 'N'
 	addi $a0, $a0, 16
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 4($a0)
 	sw $a1, 24($a0)
 	sw $a1, 28($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
 	sw $a1, 280($a0)
 	sw $a1, 284($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 520($a0)
 	sw $a1, 524($a0)
 	sw $a1, 536($a0)
 	sw $a1, 540($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 776($a0)
@@ -1418,7 +1354,6 @@ paint_win:
 	sw $a1, 784($a0)
 	sw $a1, 792($a0)
 	sw $a1, 796($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1036($a0)
@@ -1426,21 +1361,17 @@ paint_win:
 	sw $a1, 1044($a0)
 	sw $a1, 1048($a0)
 	sw $a1, 1052($a0)
-	
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
 	sw $a1, 1304($a0)
 	sw $a1, 1308($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1556($a0)
 	sw $a1, 1560($a0)
 	sw $a1, 1564($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1816($a0)
@@ -1449,7 +1380,7 @@ paint_win:
 	j end_screen
 	
 paint_you:
-	# paint Y
+	# paint 'Y'
 	sw $a1, 0($a0)
 	sw $a1, 4($a0)
 	sw $a1, 16($a0)
@@ -1478,9 +1409,7 @@ paint_you:
 	sw $a1, 1548($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
-	
-	
-	#paint O
+	# paint 'O'
 	addi $a0, $a0, 32
 	sw $a1,($a0)
 	sw $a1, 4($a0)
@@ -1488,94 +1417,78 @@ paint_you:
 	sw $a1, 12($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 264($a0)
 	sw $a1, 268($a0)
 	sw $a1, 272($a0)
 	sw $a1, 276($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 528($a0)
 	sw $a1, 532($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 784($a0)
 	sw $a1, 788($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-	
-	#paint U
+	# paint 'U'
 	addi $a0, $a0, 32
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
 	sw $a1, 272($a0)
 	sw $a1, 276($a0)
-	
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 528($a0)
 	sw $a1, 532($a0)
-	
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 784($a0)
 	sw $a1, 788($a0)
-	
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1040($a0)
 	sw $a1, 1044($a0)
-	
 	sw $a1, 1280($a0)
 	sw $a1, 1284($a0)
 	sw $a1, 1296($a0)
 	sw $a1, 1300($a0)
-	
 	sw $a1, 1536($a0)
 	sw $a1, 1540($a0)
 	sw $a1, 1544($a0)
 	sw $a1, 1548($a0)
 	sw $a1, 1552($a0)
 	sw $a1, 1556($a0)
-	
 	sw $a1, 1792($a0)
 	sw $a1, 1796($a0)
 	sw $a1, 1800($a0)
 	sw $a1, 1804($a0)
 	sw $a1, 1808($a0)
 	sw $a1, 1812($a0)
-
 	beq $a2, 01, paint_lose
 	beq $a2, 02, paint_lose
 	j paint_win
