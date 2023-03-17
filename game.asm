@@ -600,46 +600,46 @@ check_move_monster:
 	beqz $s5, check_move_monster_right
 	j check_move_monster_left
 check_move_monster_left:
-	addi $a0, $a0, 1040 	# 4 row down + 4 cell right
-	#addi $a1, $s4, -4 #move monster left
-	beq $s7, 2, monster_left_check_2
-	beq $s7, 3, monster_left_check_3
+	addi $a0, $a0, 1044 	# 4 row down + 5 cell right
+	j cmm_start
+check_move_monster_right:
+	addi $a0, $a0, 1004 	# 4 row down + 5 cell left
+	j cmm_start
+cmm_start:
+	beq $s7, 2, monster_move_check_2
+	beq $s7, 3, monster_move_check_3
 	j update_monster
-monster_left_check_2:
+monster_move_check_2:
 ml21:	li $a3, 22
 	la $a1, MONSTER_2_1
-	j check_ml
+	j check_mm
 ml22:	li $a3, 0
 	la $a1, MONSTER_2_2
-	j check_ml
-monster_left_check_3:
+	j check_mm
+monster_move_check_3:
 ml31:	li $a3, 32
 	la $a1, MONSTER_3_1
-	j check_ml
+	j check_mm
 ml32:	li $a3, 33
 	la $a1, MONSTER_3_2
-	j check_ml
+	j check_mm
 ml33:	li $a3, 0
 	la $a1, MONSTER_3_3
-	j check_ml
-check_ml:
-	add $a1, $a1, $s4
-	addi $a1, $a1, -4 #move monster left
-	beq $a0, $a1, remove_health
-	addi $a1, $a1, -256 #move monster up
-	beq $a0, $a1, remove_health
-	addi $a1, $a1, -256 #move monster up
-	beq $a0, $a1, remove_health
-	addi $a1, $a1, -256 #move monster up
-	beq $a0, $a1, remove_health
-	addi $a1, $a1, -256 #move monster up
-	beq $a0, $a1, remove_health
+	j check_mm
+check_mm:
+	add $t7, $a1, $s4
+	beq $a0, $t7, remove_health
+	addi $t7, $t7, -256 #move monster up
+	beq $a0, $t7, remove_health
+	addi $t7, $t7, -256 #move monster up
+	beq $a0, $t7, remove_health
+	addi $t7, $t7, -256 #move monster up
+	beq $a0, $t7, remove_health
+	addi $t7, $t7, -256 #move monster up
+	beq $a0, $t7, remove_health
 	beq $a3, 22, ml22
 	beq $a3, 32, ml32
 	beq $a3, 33, ml33
-	j update_monster
-	
-check_move_monster_right:
 	j update_monster
 	
 	
