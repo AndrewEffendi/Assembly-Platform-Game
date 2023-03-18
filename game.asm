@@ -83,9 +83,9 @@ next_level:
 	lw $t8, 0($t9) 
 	beq $t8, 1, keypress_happened 
 	
-	# every 0.5 got to wait_second to update gravity and move monster
+	# every 0.5 got to half_second to update gravity and move monster
 	addi $s6, $s6, 1
-	beq $s6, 50, wait_second 
+	beq $s6, 50, half_second 
 	
 	# Wait 10 milliseconds (60 hz)
 	li $v0, 32 
@@ -201,13 +201,45 @@ end_r_p_3:
 	j remove_player	
 
 # ------------------------------------
+# what happen every 0.5 seconds
+half_second:
+	li $s6, 0 # reset clock to 0
+	beqz $s4, set_monster_right
+	beq $s4, 40, set_monster_left
+	j set_monster_done
+set_monster_right:
+	li $s5, 0
+	j set_monster_done
+set_monster_left:
+	li $s5, 1
+	j set_monster_done
+set_monster_done:
+	j check_move_monster
+update_monster:
+	li $a3, 0 # not type end_r_p
+	j remove_monster
+remove_monster_done:
+	beqz $s5, move_monster_right
+	j move_monster_left 
+move_monster_left:
+	addi $s4, $s4, -4 #move monster left
+	j add_monster
+move_monster_right:
+	addi $s4, $s4, 4 #move monster right
+	j add_monster
+move_monster_done:
+	li $s6, 1 # reset clock to 1
+	li $t8, 0x73
+	j respond_to_s #go down once
+
+# ------------------------------------
 # Exit
 Exit:
  	li $v0, 10 # terminate the program gracefully 
  	syscall 
 
 #####################################################################
-#                        my functions                               #
+#                   Add, remove, paint functions                    #
 #####################################################################
 # ------------------------------------
 # paint ground
@@ -691,36 +723,11 @@ damage_player:
 	sw $a1, 1804($t7) 
 	j player_damaged
 
-wait_second:
-	li $s6, 0 # reset clock to 0
-	beqz $s4, set_monster_right
-	beq $s4, 40, set_monster_left
-	j set_monster_done
-set_monster_right:
-	li $s5, 0
-	j set_monster_done
-set_monster_left:
-	li $s5, 1
-	j set_monster_done
-set_monster_done:
-	j check_move_monster
-update_monster:
-	li $a3, 0 # not type end_r_p
-	j remove_monster
-remove_monster_done:
-	beqz $s5, move_monster_right
-	j move_monster_left 
-move_monster_left:
-	addi $s4, $s4, -4 #move monster left
-	j add_monster
-move_monster_right:
-	addi $s4, $s4, 4 #move monster right
-	j add_monster
-move_monster_done:
-	li $s6, 1 # reset clock to 1
-	li $t8, 0x73
-	j respond_to_s #go down once
-
+#####################################################################
+#             check collisions and movements functions              #
+#####################################################################
+# ------------------------------------
+# check monster movement
 check_move_monster:
 	# player location
 	li $a0, 64 	  	#t7 = 64
@@ -770,7 +777,9 @@ check_mm:
 	beq $a3, 32, ml32
 	beq $a3, 33, ml33
 	j update_monster
-	
+
+# ------------------------------------
+# check double jump	
 jump_check:
 	# player location
 	li $a0, 64 	  	#t7 = 64
@@ -844,6 +853,8 @@ double_jump_reset:
 	li $s3, 2
 	j jump_checked
 
+# ------------------------------------
+# check player at finish line
 finish_check:
 	# player location
 	li $a0, 64 	  	#t7 = 64
@@ -885,6 +896,8 @@ finish_check_3:
 	beq $a0, $t6, respond_to_k
 	j finished_check
 
+# ------------------------------------
+# check platform collision
 platform_check:
 	beq $s7, 1, platform_check_1
 	beq $s7, 2, platform_check_2
@@ -977,7 +990,9 @@ platform_checked:
 	beq $a3, 34, p34
 	beq $a3, 35, p35
 	j remove_player
-	
+
+# ------------------------------------
+# check monster and spike collision	
 collision_check:
 	beq $s7, 1, collision_check_1
 	beq $s7, 2, collision_check_2
@@ -1093,13 +1108,19 @@ collision_checked:
 damaged:
 	j remove_health
 	
+#####################################################################
+#                       Win / Lose End Screen                       #
+#####################################################################
+# ------------------------------------
+# end screen wait for player to press p to restart
 end_screen:
 	li $t9, 0xffff0000  
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j end_screen
 
-#win screen
+# ------------------------------------
+# win end screen 
 respond_to_k:
 	li $t8, 0x6b
 	li $a3, 4
@@ -1108,7 +1129,7 @@ end_r_p_4:
 	li $s7, 3
 	j remove_player	
 
-#lose screen
+# lose end screen 
 respond_to_l:
 	li $t8, 0x6c
 	li $a3, 5
@@ -1117,27 +1138,429 @@ end_r_p_5:
 	li $s7, 3
 	j remove_player
 
-#win
+# ------------------------------------
+# paint win
 win:	li $a1, COLOR_FINISH
 	li $a2, 11
 	j wl_start
+# remove win
 remove_win:	
 	li $a1, COLOR_BLACK
 	li $a2, 12
 	j wl_start
-#lose
+# paint lose
 lose:	li $a1, COLOR_RED
 	li $a2, 01
 	j wl_start
+# remove lose
 remove_lose:	
 	li $a1, COLOR_BLACK
 	li $a2, 02
 	j wl_start
+
+# ------------------------------------
+# start painting end screen message
 wl_start:
 	li $a0, BASE_ADDRESS
 	addi $a0, $a0, 3152
 	j paint_you
-	
+
+
+# ------------------------------------
+# paint 'YOU'	
+paint_you:
+	# paint 'Y'
+	sw $a1, 0($a0)
+	sw $a1, 4($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 520($a0)
+	sw $a1, 524($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1288($a0)
+	sw $a1, 1292($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	# paint 'O'
+	addi $a0, $a0, 32
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	# paint 'U'
+	addi $a0, $a0, 32
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	beq $a2, 01, paint_lose
+	beq $a2, 02, paint_lose
+	j paint_win
+ 
+# ------------------------------------
+# paint 'LOSE'	
+paint_lose:
+	# paint 'L'
+	addi $a0, $a0, 2480
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	# paint 'O'
+	addi $a0, $a0, 32
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	# paint 'S'
+	addi $a0, $a0, 32
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	# paint 'E'
+	addi $a0, $a0, 32
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	j press_p_to_restart
+
+# ------------------------------------
+# paint 'WIN'	
+paint_win:
+	# paint 'W'
+	addi $a0, $a0, 2492
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 32($a0)
+	sw $a1, 36($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 288($a0)
+	sw $a1, 292($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 544($a0)
+	sw $a1, 548($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)	
+	sw $a1, 800($a0)
+	sw $a1, 804($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1056($a0)
+	sw $a1, 1060($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1312($a0)
+	sw $a1, 1316($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1560($a0)
+	sw $a1, 1564($a0)
+	sw $a1, 1568($a0)
+	sw $a1, 1572($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	sw $a1, 1816($a0)
+	sw $a1, 1820($a0)
+	sw $a1, 1824($a0)
+	sw $a1, 1828($a0)
+	# paint 'I'
+	addi $a0, $a0, 48
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	# paint 'N'
+	addi $a0, $a0, 16
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 4($a0)
+	sw $a1, 24($a0)
+	sw $a1, 28($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 280($a0)
+	sw $a1, 284($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 520($a0)
+	sw $a1, 524($a0)
+	sw $a1, 536($a0)
+	sw $a1, 540($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 792($a0)
+	sw $a1, 796($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1048($a0)
+	sw $a1, 1052($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1304($a0)
+	sw $a1, 1308($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1560($a0)
+	sw $a1, 1564($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1816($a0)
+	sw $a1, 1820($a0)
+	j press_p_to_restart
+
+# ------------------------------------
+# paint press p to restart	
 press_p_to_restart:
 	# paint 'p'
 	beq $a2, 01, restart_lose
@@ -1341,390 +1764,3 @@ pptr_start:
 	beq $a2, 02, removed_lose
 	beq $a2, 12, removed_win
 	j end_screen
- 	
-paint_lose:
-	# paint 'L'
-	addi $a0, $a0, 2480
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'O'
-	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'S'
-	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'E'
-	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	j press_p_to_restart
-	
-paint_win:
-	# paint 'W'
-	addi $a0, $a0, 2492
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 32($a0)
-	sw $a1, 36($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 288($a0)
-	sw $a1, 292($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 544($a0)
-	sw $a1, 548($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)	
-	sw $a1, 800($a0)
-	sw $a1, 804($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1056($a0)
-	sw $a1, 1060($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1312($a0)
-	sw $a1, 1316($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1560($a0)
-	sw $a1, 1564($a0)
-	sw $a1, 1568($a0)
-	sw $a1, 1572($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	sw $a1, 1816($a0)
-	sw $a1, 1820($a0)
-	sw $a1, 1824($a0)
-	sw $a1, 1828($a0)
-	# paint 'I'
-	addi $a0, $a0, 48
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	# paint 'N'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 4($a0)
-	sw $a1, 24($a0)
-	sw $a1, 28($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 280($a0)
-	sw $a1, 284($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 524($a0)
-	sw $a1, 536($a0)
-	sw $a1, 540($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 792($a0)
-	sw $a1, 796($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1048($a0)
-	sw $a1, 1052($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1304($a0)
-	sw $a1, 1308($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1560($a0)
-	sw $a1, 1564($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1816($a0)
-	sw $a1, 1820($a0)
-	j press_p_to_restart
-	
-paint_you:
-	# paint 'Y'
-	sw $a1, 0($a0)
-	sw $a1, 4($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 524($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1288($a0)
-	sw $a1, 1292($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	# paint 'O'
-	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'U'
-	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	beq $a2, 01, paint_lose
-	beq $a2, 02, paint_lose
-	j paint_win
