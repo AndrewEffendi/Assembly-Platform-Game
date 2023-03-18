@@ -717,22 +717,19 @@ cmm_start:
 	beq $s7, 3, monster_move_check_3
 	j update_monster
 monster_move_check_2:
-ml21:	li $a3, 22
 	li $a1, MONSTER_2_1
-	j check_mm
-ml22:	li $a3, 0
+	jal check_mm
 	li $a1, MONSTER_2_2
-	j check_mm
+	jal check_mm
+	j update_monster
 monster_move_check_3:
-ml31:	li $a3, 32
 	li $a1, MONSTER_3_1
-	j check_mm
-ml32:	li $a3, 33
+	jal check_mm
 	li $a1, MONSTER_3_2
-	j check_mm
-ml33:	li $a3, 0
+	jal check_mm
 	li $a1, MONSTER_3_3
-	j check_mm
+	jal check_mm
+	j update_monster
 check_mm:
 	add $t7, $a1, $s4
 	beq $a0, $t7, remove_health
@@ -744,10 +741,8 @@ check_mm:
 	beq $a0, $t7, remove_health
 	addi $t7, $t7, -256 #move monster up
 	beq $a0, $t7, remove_health
-	beq $a3, 22, ml22
-	beq $a3, 32, ml32
-	beq $a3, 33, ml33
-	j update_monster
+	jr $ra
+	
 
 # ------------------------------------
 # check double jump	
@@ -757,6 +752,7 @@ jump_check:
 	mul $a0, $a0, $s2 	#t7 = 32*y
 	add $a0, $s1, $a0 	#t7 = x + 32*y
 	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
+# check double jump ground
 jump_check_ground:
 	li $t6, GROUND
     	li $t7, 0
@@ -772,36 +768,31 @@ end_loop_jcg:
 	beq $s7, 1, jump_check_1
 	beq $s7, 2, jump_check_2
 	j jump_check_3
+# check double jump platform
 jump_check_1:
-jc11:	li $a3, 12
 	li $a1, PLATFORM_1_1
-	j jump_check_patform
-jc12:	li $a3, 0
+	jal jump_check_patform
 	li $a1, PLATFORM_1_2
-	j jump_check_patform
+	jal jump_check_patform
+	j jump_checked
 jump_check_2:
-jc21:	li $a3, 22
 	li $a1, PLATFORM_2_1 
-	j jump_check_patform
-jc22:	li $a3, 0
+	jal jump_check_patform
 	li $a1, PLATFORM_2_2
-	j jump_check_patform
+	jal jump_check_patform
+	j jump_checked
 jump_check_3:
-jc31:	li $a3, 32
 	li $a1, PLATFORM_3_1 
-	j jump_check_patform
-jc32:	li $a3, 33
+	jal jump_check_patform
 	li $a1, PLATFORM_3_2
-	j jump_check_patform
-jc33:	li $a3, 34
+	jal jump_check_patform
 	li $a1, PLATFORM_3_3 
-	j jump_check_patform
-jc34:	li $a3, 35
+	jal jump_check_patform
 	li $a1, PLATFORM_3_4
-	j jump_check_patform
-jc35:	li $a3, 0
+	jal jump_check_patform
 	li $a1, PLATFORM_3_5 
-	j jump_check_patform
+	jal jump_check_patform
+	j jump_checked
 jump_check_patform:
 	li $t7, -2 # init t7 = 0
 loop_jcp:
@@ -813,13 +804,7 @@ loop_jcp:
     	addi $t7, $t7, 1
     	j loop_jcp
 end_loop_jcp:
-	beq $a3, 12, jc12
-	beq $a3, 22, jc22
-	beq $a3, 32, jc32
-	beq $a3, 33, jc33
-	beq $a3, 34, jc34
-	beq $a3, 35, jc35
-	j jump_checked
+	jr $ra
 double_jump_reset:
 	li $s3, 2
 	j jump_checked
@@ -873,37 +858,30 @@ platform_check:
 	beq $s7, 1, platform_check_1
 	beq $s7, 2, platform_check_2
 	j platform_check_3
-#$a3, next label
 platform_check_1:
-p11:	li $a3, 12
 	li $a1, PLATFORM_1_1 
-	j check_mtp
-p12:	li $a3, 0
+	jal check_mtp
 	li $a1, PLATFORM_1_2
-	j check_mtp
+	jal check_mtp
+	j remove_player
 platform_check_2:
-p21:	li $a3, 22
 	li $a1, PLATFORM_2_1 
-	j check_mtp
-p22:	li $a3, 0
+	jal check_mtp
 	li $a1, PLATFORM_2_2
-	j check_mtp
+	jal check_mtp
+	j remove_player
 platform_check_3:
-p31:	li $a3, 32
 	li $a1, PLATFORM_3_1 
-	j check_mtp
-p32:	li $a3, 33
+	jal check_mtp
 	li $a1, PLATFORM_3_2
-	j check_mtp
-p33:	li $a3, 34
+	jal check_mtp
 	li $a1, PLATFORM_3_3 
-	j check_mtp
-p34:	li $a3, 35
+	jal check_mtp
 	li $a1, PLATFORM_3_4
-	j check_mtp
-p35:	li $a3, 0
+	jal check_mtp
 	li $a1, PLATFORM_3_5 
-	j check_mtp
+	jal check_mtp
+	j remove_player
 
 check_mtp:
 	li $a0, 64 	  	#t7 = 64
@@ -939,7 +917,7 @@ loop_vpc:
     	addi $t5, $t5, 1
     	j loop_vpc
 end_loop_vpc:
-	j platform_checked
+	jr $ra
 
 sp_check:
 #$a0 player location + offset
@@ -950,17 +928,7 @@ sp_check:
 csp: 	addi $a1, $a1, 72
 	ble $a0, $a1, wait
 sp_check_next:
-	j platform_checked
-	
-platform_checked:
-	# a3 next label
-	beq $a3, 12, p12
-	beq $a3, 22, p22
-	beq $a3, 32, p32
-	beq $a3, 33, p33
-	beq $a3, 34, p34
-	beq $a3, 35, p35
-	j remove_player
+	jr $ra
 
 # ------------------------------------
 # check monster and spike collision	
@@ -971,51 +939,42 @@ collision_check:
 #$a3, next label
 # check collission for lvl 1
 collision_check_1:
-c11:	li $a3, 12
 	li $a1, SPIKE_1_1 
-	j check_mt
-c12:	li $a3, 13
+	jal check_mt
 	li $a1, SPIKE_1_2
-	j check_mt
-c13:	li $a3, 0
+	jal check_mt
 	li $a1, SPIKE_1_3
-	j check_mt
+	jal check_mt
+	j platform_check
 #check collision for level 2
 collision_check_2:
-c21:	li $a3, 22
 	li $a1, SPIKE_2_1 
-	j check_mt
-c22:	li $a3, 23
+	jal check_mt
 	li $a1, SPIKE_2_2
-	j check_mt
-c23:	li $a3, 24
+	jal check_mt
 	li $a1, MONSTER_2_1
 	add $a1, $a1, $s4
-	j check_mt
-c24:	li $a3, 0
+	jal check_mt
 	li $a1, MONSTER_2_2
 	add $a1, $a1, $s4
-	j check_mt
+	jal check_mt
+	j platform_check
 #check collision for level 3
 collision_check_3:
-c31:	li $a3, 32
 	li $a1, SPIKE_3_1 
-	j check_mt
-c32:	li $a3, 33
+	jal check_mt
 	li $a1, SPIKE_3_2
-	j check_mt
-c33:	li $a3, 34
+	jal check_mt
 	li $a1, MONSTER_3_1
 	add $a1, $a1, $s4
-	j check_mt
-c34:	li $a3, 35
+	jal check_mt
 	li $a1, MONSTER_3_2
 	add $a1, $a1, $s4
-	j check_mt
-c35:	li $a3, 0
+	jal check_mt
 	li $a1, MONSTER_3_3
 	add $a1, $a1, $s4
-	j check_mt
+	jal check_mt
+	j platform_check
 
 #check movement type
 check_mt:
@@ -1044,12 +1003,12 @@ vertical_check:
 loop_vc:
 	bge $t5, 5, end_loop_vc
 	# here damage
-	beq $a1, $a0, damaged
+	beq $a1, $a0, remove_health
 	addi $a1, $a1, 256
     	addi $t5, $t5, 1
     	j loop_vc
 end_loop_vc:
-	j collision_checked
+	jr $ra
 	
 s_check:
 #$a0 player location + offset
@@ -1059,25 +1018,9 @@ s_check:
 	j s_check_next
 cs: 	addi $a1, $a1, 32
 	# here damage
-	ble $a0, $a1, damaged
+	ble $a0, $a1, remove_health
 s_check_next:
-	j collision_checked
-
-collision_checked:
-	# $a3 next label
-	beq $a3, 12, c12
-	beq $a3, 13, c13
-	beq $a3, 22, c22
-	beq $a3, 23, c23
-	beq $a3, 24, c24
-	beq $a3, 32, c32
-	beq $a3, 33, c33
-	beq $a3, 34, c34
-	beq $a3, 35, c35
-	j platform_check
-
-damaged:
-	j remove_health
+	jr $ra
 	
 #####################################################################
 #                       Win / Lose End Screen                       #
