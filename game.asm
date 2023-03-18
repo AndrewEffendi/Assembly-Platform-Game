@@ -78,8 +78,8 @@ next_level:
  	li $t0, 0 # jump counter
 
 # ground function
-ground:	la $a1, COLOR_GROUND
-	la $a0, GROUND
+ground:	li $a1, COLOR_GROUND
+	li $a0, GROUND
  	j paint_ground
 paint_ground:
 	# $a0: position
@@ -97,35 +97,35 @@ loop_ground:
  
 # spike function
 spike:	li $a3,0
-	la $a1, COLOR_SPIKE
+	li $a1, COLOR_SPIKE
 	j s_skip
 remove_spike:
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 s_skip: beq $s7, 2, spike_lvl_2
 	beq $s7, 3, spike_lvl_3
 spike_lvl_1:
 	li $a2, 12 
-	la $a0, SPIKE_1_1
+	li $a0, SPIKE_1_1
 	j paint_spike
 s_1_2:	li $a2, 13
-	la $a0, SPIKE_1_2
+	li $a0, SPIKE_1_2
 	j paint_spike
 s_1_3:	li $a2, 0
-	la $a0, SPIKE_1_3
+	li $a0, SPIKE_1_3
 	j paint_spike
 spike_lvl_2:
 	li $a2, 22
-	la $a0, SPIKE_2_1
+	li $a0, SPIKE_2_1
 	j paint_spike
 s_2_2:	li $a2, 0
-	la $a0, SPIKE_2_2
+	li $a0, SPIKE_2_2
 	j paint_spike
 spike_lvl_3:
 	li $a2, 32
-	la $a0, SPIKE_3_1
+	li $a0, SPIKE_3_1
 	j paint_spike
 s_3_2:	li $a2, 0
-	la $a0, SPIKE_3_2
+	li $a0, SPIKE_3_2
 	j paint_spike
 paint_spike:
 	# $a0: position
@@ -158,41 +158,41 @@ paint_spike:
 # platform function
 platform: 
 	li $a3,0
-	la $a1, COLOR_PLATFORM
+	li $a1, COLOR_PLATFORM
 	j p_skip
 remove_platform:
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 p_skip:	beq $s7, 2, platform_lvl_2
 	beq $s7, 3, platform_lvl_3
 platform_lvl_1:
 	li $a2, 12
-	la $a0, PLATFORM_1_1
+	li $a0, PLATFORM_1_1
 	j paint_platform
 p_1_2:	li $a2, 0
-	la $a0, PLATFORM_1_2
+	li $a0, PLATFORM_1_2
 	j paint_platform
 platform_lvl_2:
 	li $a2, 22
-	la $a0, PLATFORM_2_1
+	li $a0, PLATFORM_2_1
 	j paint_platform
 p_2_2:	li $a2, 0
-	la $a0, PLATFORM_2_2
+	li $a0, PLATFORM_2_2
 	j paint_platform
 platform_lvl_3:
 	li $a2, 32
-	la $a0, PLATFORM_3_1
+	li $a0, PLATFORM_3_1
 	j paint_platform
 p_3_2:	li $a2, 33
-	la $a0, PLATFORM_3_2
+	li $a0, PLATFORM_3_2
 	j paint_platform
 p_3_3:	li $a2, 34
-	la $a0, PLATFORM_3_3
+	li $a0, PLATFORM_3_3
 	j paint_platform
 p_3_4:	li $a2, 35
-	la $a0, PLATFORM_3_4
+	li $a0, PLATFORM_3_4
 	j paint_platform
 p_3_5:	li $a2, 0
-	la $a0, PLATFORM_3_5
+	li $a0, PLATFORM_3_5
 	j paint_platform
 paint_platform:
 	# $a0: position
@@ -222,34 +222,34 @@ end_loop_p:
 # monster function
 monster:
 	li $a3,0 # $s3: remove calling function, monster not remove
-	la $a1, COLOR_MONSTER
+	li $a1, COLOR_MONSTER
 	j m_skip
 remove_monster:
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 m_skip:	beq $s7, 2, monster_lvl_2
 	beq $s7, 3, monster_lvl_3
 monster_lvl_1:
 	j skip_paint_monster # no monster for level 1
 monster_lvl_2:
-	la $a2, 22
-	la $a0, MONSTER_2_1
+	li $a2, 22
+	li $a0, MONSTER_2_1
 	add $a0, $a0, $s4
 	j paint_monster
 m_2_2:	li $a2, 0
-	la $a0, MONSTER_2_2
+	li $a0, MONSTER_2_2
 	add $a0, $a0, $s4
 	j paint_monster
 monster_lvl_3:
 	li $a2, 32
-	la $a0, MONSTER_3_1
+	li $a0, MONSTER_3_1
 	add $a0, $a0, $s4
 	j paint_monster
 m_3_2:	li $a2, 33
-	la $a0, MONSTER_3_2
+	li $a0, MONSTER_3_2
 	add $a0, $a0, $s4
 	j paint_monster
 m_3_3:	li $a2, 0
-	la $a0, MONSTER_3_3
+	li $a0, MONSTER_3_3
 	add $a0, $a0, $s4
 	j paint_monster
 paint_monster:
@@ -292,22 +292,22 @@ skip_paint_monster:
 	beqz $s6, move_monster_next
 	j finish
 move_monster_next:	
-	la $t7, COLOR_BLACK	
+	li $t7, COLOR_BLACK	
 	beq $a1, $t7 , remove_monster_done	
 	j move_monster_done
 
 # finish line function
-finish:	la $a1, COLOR_FINISH
+finish:	li $a1, COLOR_FINISH
 	beq $s7, 2, finish_lvl_2
 	beq $s7, 3, finish_lvl_3
 finish_lvl_1:
-	la $a0, FINISH_1
+	li $a0, FINISH_1
 	j paint_finish
 finish_lvl_2:
-	la $a0, FINISH_2
+	li $a0, FINISH_2
 	j paint_finish
 finish_lvl_3:
-	la $a0, FINISH_3
+	li $a0, FINISH_3
 	j paint_finish
 paint_finish:
 	# $a0: position
@@ -323,17 +323,17 @@ paint_finish:
 
 # health function
 remove_health:
-	la, $a1, COLOR_BLACK
+	li, $a1, COLOR_BLACK
 	li $a2, 4
 	beq $s0, 3, rh_3
 	beq $s0, 2, rh_2
 	beq $s0, 1, rh_1
 	j respond_to_l
-rh_3:	la, $a0, HEALTH_3
+rh_3:	li, $a0, HEALTH_3
 	j paint_health
-rh_2:	la, $a0, HEALTH_2
+rh_2:	li, $a0, HEALTH_2
 	j paint_health
-rh_1:	la, $a0, HEALTH_1
+rh_1:	li, $a0, HEALTH_1
 	j paint_health
 removed_health:
 	j damage_player
@@ -343,17 +343,17 @@ player_damaged:
 	beqz $s6, move_monster_done
 	j wait
 
-health:	la, $a1, COLOR_HEALTH
+health:	li, $a1, COLOR_HEALTH
 	li $a2, 2
-	la, $a0, HEALTH_1
+	li, $a0, HEALTH_1
 	j paint_health
 h_2:	blt $s0, 2, player #if health less than 2 don't paint
 	li $a2, 3
-	la, $a0, HEALTH_2
+	li, $a0, HEALTH_2
 	j paint_health
 h_3:	blt $s0, 3, player #if health less than 3 don't paint
 	li $a2, 0
-	la, $a0, HEALTH_3
+	li, $a0, HEALTH_3
 	j paint_health
 paint_health:
 	# $a0: position
@@ -387,7 +387,7 @@ paint_player:
 	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
 	add $t7, $s1, $t7 	#t7 = x + 64*y
 	addi $t7, $t7, BASE_ADDRESS
-	la $a1, COLOR_RED
+	li $a1, COLOR_RED
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
 	sw $a1, 12($t7)
@@ -397,7 +397,7 @@ paint_player:
 	sw $a1, 272($t7)
 	sw $a1, 1028($t7)
 	sw $a1, 1036($t7)
-	la $a1, COLOR_CREAM
+	li $a1, COLOR_CREAM
 	sw $a1, 516($t7)
 	sw $a1, 520($t7)
 	sw $a1, 524($t7)
@@ -408,7 +408,7 @@ paint_player:
 	sw $a1, 1040($t7)
 	sw $a1, 2052($t7)
 	sw $a1, 2060($t7)
-	la $a1, COLOR_BLUE
+	li $a1, COLOR_BLUE
 	sw $a1, 1032($t7)
 	sw $a1, 1284($t7)
 	sw $a1, 1288($t7)
@@ -435,7 +435,7 @@ remove_player:
 	mul $t7, $t7, $s2 	#t7 = 32*y
 	add $t7, $s1, $t7 	#t7 = x + 32*y
 	addi $t7, $t7, BASE_ADDRESS
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
 	sw $a1, 12($t7)
@@ -480,7 +480,7 @@ damage_player:
 	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
 	add $t7, $s1, $t7 	#t7 = x + 64*y
 	addi $t7, $t7, BASE_ADDRESS
-	la $a1, COLOR_RED
+	li $a1, COLOR_RED
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
 	sw $a1, 12($t7)
@@ -513,7 +513,7 @@ damage_player:
 	li $v0, 32 
 	li $a0, 100   # Wait 100 milliseconds 
 	syscall 
-	la $a1, COLOR_RED
+	li $a1, COLOR_RED
 	sw $a1, 4($t7)
 	sw $a1, 8($t7)
 	sw $a1, 12($t7)
@@ -523,7 +523,7 @@ damage_player:
 	sw $a1, 272($t7)
 	sw $a1, 1028($t7)
 	sw $a1, 1036($t7)
-	la $a1, COLOR_CREAM
+	li $a1, COLOR_CREAM
 	sw $a1, 516($t7)
 	sw $a1, 520($t7)
 	sw $a1, 524($t7)
@@ -534,7 +534,7 @@ damage_player:
 	sw $a1, 1040($t7)
 	sw $a1, 2052($t7)
 	sw $a1, 2060($t7)
-	la $a1, COLOR_BLUE
+	li $a1, COLOR_BLUE
 	sw $a1, 1032($t7)
 	sw $a1, 1284($t7)
 	sw $a1, 1288($t7)
@@ -608,20 +608,20 @@ cmm_start:
 	j update_monster
 monster_move_check_2:
 ml21:	li $a3, 22
-	la $a1, MONSTER_2_1
+	li $a1, MONSTER_2_1
 	j check_mm
 ml22:	li $a3, 0
-	la $a1, MONSTER_2_2
+	li $a1, MONSTER_2_2
 	j check_mm
 monster_move_check_3:
 ml31:	li $a3, 32
-	la $a1, MONSTER_3_1
+	li $a1, MONSTER_3_1
 	j check_mm
 ml32:	li $a3, 33
-	la $a1, MONSTER_3_2
+	li $a1, MONSTER_3_2
 	j check_mm
 ml33:	li $a3, 0
-	la $a1, MONSTER_3_3
+	li $a1, MONSTER_3_3
 	j check_mm
 check_mm:
 	add $t7, $a1, $s4
@@ -702,7 +702,7 @@ jump_check:
 	add $a0, $s1, $a0 	#t7 = x + 32*y
 	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
 jump_check_ground:
-	la $t6, GROUND
+	li $t6, GROUND
     	li $t7, 0
 loop_jcg:
 	bge $t7, 64, end_loop_jcg
@@ -718,33 +718,33 @@ end_loop_jcg:
 	j jump_check_3
 jump_check_1:
 jc11:	li $a3, 12
-	la $a1, PLATFORM_1_1
+	li $a1, PLATFORM_1_1
 	j jump_check_patform
 jc12:	li $a3, 0
-	la $a1, PLATFORM_1_2
+	li $a1, PLATFORM_1_2
 	j jump_check_patform
 jump_check_2:
 jc21:	li $a3, 22
-	la $a1, PLATFORM_2_1 
+	li $a1, PLATFORM_2_1 
 	j jump_check_patform
 jc22:	li $a3, 0
-	la $a1, PLATFORM_2_2
+	li $a1, PLATFORM_2_2
 	j jump_check_patform
 jump_check_3:
 jc31:	li $a3, 32
-	la $a1, PLATFORM_3_1 
+	li $a1, PLATFORM_3_1 
 	j jump_check_patform
 jc32:	li $a3, 33
-	la $a1, PLATFORM_3_2
+	li $a1, PLATFORM_3_2
 	j jump_check_patform
 jc33:	li $a3, 34
-	la $a1, PLATFORM_3_3 
+	li $a1, PLATFORM_3_3 
 	j jump_check_patform
 jc34:	li $a3, 35
-	la $a1, PLATFORM_3_4
+	li $a1, PLATFORM_3_4
 	j jump_check_patform
 jc35:	li $a3, 0
-	la $a1, PLATFORM_3_5 
+	li $a1, PLATFORM_3_5 
 	j jump_check_patform
 jump_check_patform:
 	li $t7, -2 # init t7 = 0
@@ -816,33 +816,33 @@ platform_check:
 #$a3, next label
 platform_check_1:
 p11:	li $a3, 12
-	la $a1, PLATFORM_1_1 
+	li $a1, PLATFORM_1_1 
 	j check_mtp
 p12:	li $a3, 0
-	la $a1, PLATFORM_1_2
+	li $a1, PLATFORM_1_2
 	j check_mtp
 platform_check_2:
 p21:	li $a3, 22
-	la $a1, PLATFORM_2_1 
+	li $a1, PLATFORM_2_1 
 	j check_mtp
 p22:	li $a3, 0
-	la $a1, PLATFORM_2_2
+	li $a1, PLATFORM_2_2
 	j check_mtp
 platform_check_3:
 p31:	li $a3, 32
-	la $a1, PLATFORM_3_1 
+	li $a1, PLATFORM_3_1 
 	j check_mtp
 p32:	li $a3, 33
-	la $a1, PLATFORM_3_2
+	li $a1, PLATFORM_3_2
 	j check_mtp
 p33:	li $a3, 34
-	la $a1, PLATFORM_3_3 
+	li $a1, PLATFORM_3_3 
 	j check_mtp
 p34:	li $a3, 35
-	la $a1, PLATFORM_3_4
+	li $a1, PLATFORM_3_4
 	j check_mtp
 p35:	li $a3, 0
-	la $a1, PLATFORM_3_5 
+	li $a1, PLATFORM_3_5 
 	j check_mtp
 
 check_mtp:
@@ -910,48 +910,48 @@ collision_check:
 # check collission for lvl 1
 collision_check_1:
 c11:	li $a3, 12
-	la $a1, SPIKE_1_1 
+	li $a1, SPIKE_1_1 
 	j check_mt
 c12:	li $a3, 13
-	la $a1, SPIKE_1_2
+	li $a1, SPIKE_1_2
 	j check_mt
 c13:	li $a3, 0
-	la $a1, SPIKE_1_3
+	li $a1, SPIKE_1_3
 	j check_mt
 #check collision for level 2
 collision_check_2:
 c21:	li $a3, 22
-	la $a1, SPIKE_2_1 
+	li $a1, SPIKE_2_1 
 	j check_mt
 c22:	li $a3, 23
-	la $a1, SPIKE_2_2
+	li $a1, SPIKE_2_2
 	j check_mt
 c23:	li $a3, 24
-	la $a1, MONSTER_2_1
+	li $a1, MONSTER_2_1
 	add $a1, $a1, $s4
 	j check_mt
 c24:	li $a3, 0
-	la $a1, MONSTER_2_2
+	li $a1, MONSTER_2_2
 	add $a1, $a1, $s4
 	j check_mt
 #check collision for level 3
 collision_check_3:
 c31:	li $a3, 32
-	la $a1, SPIKE_3_1 
+	li $a1, SPIKE_3_1 
 	j check_mt
 c32:	li $a3, 33
-	la $a1, SPIKE_3_2
+	li $a1, SPIKE_3_2
 	j check_mt
 c33:	li $a3, 34
-	la $a1, MONSTER_3_1
+	li $a1, MONSTER_3_1
 	add $a1, $a1, $s4
 	j check_mt
 c34:	li $a3, 35
-	la $a1, MONSTER_3_2
+	li $a1, MONSTER_3_2
 	add $a1, $a1, $s4
 	j check_mt
 c35:	li $a3, 0
-	la $a1, MONSTER_3_3
+	li $a1, MONSTER_3_3
 	add $a1, $a1, $s4
 	j check_mt
 
@@ -1079,19 +1079,19 @@ end_r_p_5:
 	j remove_player
 
 #win
-win:	la $a1, COLOR_FINISH
+win:	li $a1, COLOR_FINISH
 	li $a2, 11
 	j wl_start
 remove_win:	
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 	li $a2, 12
 	j wl_start
 #lose
-lose:	la $a1, COLOR_RED
+lose:	li $a1, COLOR_RED
 	li $a2, 01
 	j wl_start
 remove_lose:	
-	la $a1, COLOR_BLACK
+	li $a1, COLOR_BLACK
 	li $a2, 02
 	j wl_start
 wl_start:
