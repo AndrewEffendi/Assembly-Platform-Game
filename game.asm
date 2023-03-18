@@ -1083,272 +1083,26 @@ wl_start:
 # ------------------------------------
 # paint 'YOU'	
 paint_you:
-	# paint 'Y'
-	sw $a1, 0($a0)
-	sw $a1, 4($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 524($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1288($a0)
-	sw $a1, 1292($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	# paint 'O'
+	jal paint_big_Y
 	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'U'
+	jal paint_big_O
 	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
+	jal paint_big_U
 	beq $a2, 01, paint_lose
 	beq $a2, 02, paint_lose
 	j paint_win
- 
+
 # ------------------------------------
 # paint 'LOSE'	
 paint_lose:
-	# paint 'L'
 	addi $a0, $a0, 2480
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'O'
+	jal paint_big_L
 	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 528($a0)
-	sw $a1, 532($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'S'
+	jal paint_big_O
 	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
-	# paint 'E'
+	jal paint_big_S
 	addi $a0, $a0, 32
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 12($a0)
-	sw $a1, 16($a0)
-	sw $a1, 20($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 268($a0)
-	sw $a1, 272($a0)
-	sw $a1, 276($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 776($a0)
-	sw $a1, 780($a0)
-	sw $a1, 784($a0)
-	sw $a1, 788($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1544($a0)
-	sw $a1, 1548($a0)
-	sw $a1, 1552($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1800($a0)
-	sw $a1, 1804($a0)
-	sw $a1, 1808($a0)
-	sw $a1, 1812($a0)
+	jal paint_big_E
 	j press_p_to_restart
 
 # ------------------------------------
@@ -1356,6 +1110,321 @@ paint_lose:
 paint_win:
 	# paint 'W'
 	addi $a0, $a0, 2492
+	jal paint_big_W
+	# paint 'I'
+	addi $a0, $a0, 48
+	jal paint_big_I
+	# paint 'N'
+	addi $a0, $a0, 16
+	jal paint_big_N
+	j press_p_to_restart
+
+# ------------------------------------
+# paint press p to restart	
+press_p_to_restart:
+	beq $a2, 01, restart_lose
+	beq $a2, 02, restart_lose
+	j restart_win
+restart_win:
+	addi $a0, $a0, 2988
+	j pptr_start
+restart_lose:
+	addi $a0, $a0, 2964
+	j pptr_start
+pptr_start:
+	jal paint_P
+	addi $a0, $a0, 16
+	jal paint_R
+	addi $a0, $a0, 16
+	jal paint_E
+	addi $a0, $a0, 16
+	jal paint_S
+	addi $a0, $a0, 16
+	jal paint_S
+	
+	addi $a0, $a0, 24
+	jal paint_P
+	
+	addi $a0, $a0, 24
+	jal paint_T
+	addi $a0, $a0, 16
+	jal paint_O
+	
+	addi $a0, $a0, 1936
+	jal paint_R
+	addi $a0, $a0, 16
+	jal paint_E
+	addi $a0, $a0, 16
+	jal paint_S
+	addi $a0, $a0, 16
+	jal paint_T
+	addi $a0, $a0, 16
+	jal paint_A
+	addi $a0, $a0, 16
+	jal paint_R
+	addi $a0, $a0, 16
+	jal paint_T
+	
+	beq $a2, 02, removed_lose
+	beq $a2, 12, removed_win
+	j end_screen
+
+# ------------------------------------
+# paint big letters
+paint_big_E:
+ 	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	jr $ra
+paint_big_I:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	jr $ra
+ paint_big_L:
+ 	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	jr $ra	
+paint_big_N:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 4($a0)
+	sw $a1, 24($a0)
+	sw $a1, 28($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 280($a0)
+	sw $a1, 284($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 520($a0)
+	sw $a1, 524($a0)
+	sw $a1, 536($a0)
+	sw $a1, 540($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 792($a0)
+	sw $a1, 796($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1048($a0)
+	sw $a1, 1052($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1304($a0)
+	sw $a1, 1308($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1560($a0)
+	sw $a1, 1564($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1816($a0)
+	sw $a1, 1820($a0)
+	jr $ra
+ paint_big_O:
+ 	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	jr $ra	
+paint_big_S:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 12($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 264($a0)
+	sw $a1, 268($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 776($a0)
+	sw $a1, 780($a0)
+	sw $a1, 784($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	sw $a1, 1036($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	jr $ra
+ paint_big_U:
+ 	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
+	sw $a1, 256($a0)
+	sw $a1, 260($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
+	sw $a1, 768($a0)
+	sw $a1, 772($a0)
+	sw $a1, 784($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1040($a0)
+	sw $a1, 1044($a0)
+	sw $a1, 1280($a0)
+	sw $a1, 1284($a0)
+	sw $a1, 1296($a0)
+	sw $a1, 1300($a0)
+	sw $a1, 1536($a0)
+	sw $a1, 1540($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1552($a0)
+	sw $a1, 1556($a0)
+	sw $a1, 1792($a0)
+	sw $a1, 1796($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	sw $a1, 1808($a0)
+	sw $a1, 1812($a0)
+	jr $ra
+paint_big_W:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 32($a0)
@@ -1406,87 +1475,81 @@ paint_win:
 	sw $a1, 1820($a0)
 	sw $a1, 1824($a0)
 	sw $a1, 1828($a0)
-	# paint 'I'
-	addi $a0, $a0, 48
-	sw $a1,($a0)
+	jr $ra
+ paint_big_Y:
+ 	sw $a1, 0($a0)
 	sw $a1, 4($a0)
+	sw $a1, 16($a0)
+	sw $a1, 20($a0)
 	sw $a1, 256($a0)
 	sw $a1, 260($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	# paint 'N'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 4($a0)
-	sw $a1, 24($a0)
-	sw $a1, 28($a0)
-	sw $a1, 256($a0)
-	sw $a1, 260($a0)
-	sw $a1, 264($a0)
-	sw $a1, 280($a0)
-	sw $a1, 284($a0)
+	sw $a1, 272($a0)
+	sw $a1, 276($a0)
 	sw $a1, 512($a0)
 	sw $a1, 516($a0)
 	sw $a1, 520($a0)
 	sw $a1, 524($a0)
-	sw $a1, 536($a0)
-	sw $a1, 540($a0)
+	sw $a1, 528($a0)
+	sw $a1, 532($a0)
 	sw $a1, 768($a0)
 	sw $a1, 772($a0)
 	sw $a1, 776($a0)
 	sw $a1, 780($a0)
 	sw $a1, 784($a0)
-	sw $a1, 792($a0)
-	sw $a1, 796($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
+	sw $a1, 788($a0)
+	sw $a1, 1032($a0)
 	sw $a1, 1036($a0)
-	sw $a1, 1040($a0)
-	sw $a1, 1044($a0)
-	sw $a1, 1048($a0)
-	sw $a1, 1052($a0)
-	sw $a1, 1280($a0)
-	sw $a1, 1284($a0)
-	sw $a1, 1296($a0)
-	sw $a1, 1300($a0)
-	sw $a1, 1304($a0)
-	sw $a1, 1308($a0)
-	sw $a1, 1536($a0)
-	sw $a1, 1540($a0)
-	sw $a1, 1556($a0)
-	sw $a1, 1560($a0)
-	sw $a1, 1564($a0)
-	sw $a1, 1792($a0)
-	sw $a1, 1796($a0)
-	sw $a1, 1816($a0)
-	sw $a1, 1820($a0)
-	j press_p_to_restart
-
+	sw $a1, 1288($a0)
+	sw $a1, 1292($a0)
+	sw $a1, 1544($a0)
+	sw $a1, 1548($a0)
+	sw $a1, 1800($a0)
+	sw $a1, 1804($a0)
+	jr $ra
 # ------------------------------------
-# paint press p to restart	
-press_p_to_restart:
-	# paint 'p'
-	beq $a2, 01, restart_lose
-	beq $a2, 02, restart_lose
-	j restart_win
-restart_win:
-	addi $a0, $a0, 2988
-	j pptr_start
-restart_lose:
-	addi $a0, $a0, 2964
-	j pptr_start
-pptr_start:
+# paint small letters
+paint_A:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 256($a0)
+	sw $a1, 264($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 520($a0)
+	sw $a1, 768($a0)
+	sw $a1, 776($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1032($a0)
+	jr $ra	
+paint_E:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 256($a0)
+	sw $a1, 512($a0)
+	sw $a1, 516($a0)
+	sw $a1, 520($a0)
+	sw $a1, 768($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	jr $ra
+paint_O:
+	sw $a1,($a0)
+	sw $a1, 4($a0)
+	sw $a1, 8($a0)
+	sw $a1, 256($a0)
+	sw $a1, 264($a0)
+	sw $a1, 512($a0)
+	sw $a1, 520($a0)
+	sw $a1, 768($a0)
+	sw $a1, 776($a0)
+	sw $a1, 1024($a0)
+	sw $a1, 1028($a0)
+	sw $a1, 1032($a0)
+	jr $ra
+paint_P:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -1497,8 +1560,8 @@ pptr_start:
 	sw $a1, 520($a0)
 	sw $a1, 768($a0)
 	sw $a1, 1024($a0)
-	# paint 'R'
-	addi $a0, $a0, 16
+	jr $ra
+paint_R:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -1511,21 +1574,8 @@ pptr_start:
 	sw $a1, 772($a0)
 	sw $a1, 1024($a0)
 	sw $a1, 1032($a0)
-	#  paint 'E'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	#  paint 'S'
-	addi $a0, $a0, 16
+	jr $ra
+paint_S:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -1537,35 +1587,8 @@ pptr_start:
 	sw $a1, 1024($a0)
 	sw $a1, 1028($a0)
 	sw $a1, 1032($a0)
-	#  paint 'S'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 776($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	
-	# paint 'p'
-	addi $a0, $a0, 24
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 264($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 1024($a0)
-	
-	#  paint 'T'
-	addi $a0, $a0, 24
+	jr $ra
+paint_T:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
 	sw $a1, 8($a0)
@@ -1573,108 +1596,5 @@ pptr_start:
 	sw $a1, 516($a0)
 	sw $a1, 772($a0)
 	sw $a1, 1028($a0)
-	#  paint 'O'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 264($a0)
-	sw $a1, 512($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 776($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	
-	# paint 'R'
-	addi $a0, $a0, 1936
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 264($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1032($a0)
-	#  paint 'E'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	#  paint 'S'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 776($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1028($a0)
-	sw $a1, 1032($a0)
-	#  paint 'T'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 260($a0)
-	sw $a1, 516($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1028($a0)
-	#  paint 'A'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 264($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 776($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1032($a0)
-	# paint 'R'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 256($a0)
-	sw $a1, 264($a0)
-	sw $a1, 512($a0)
-	sw $a1, 516($a0)
-	sw $a1, 520($a0)
-	sw $a1, 768($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1024($a0)
-	sw $a1, 1032($a0)
-	#  paint 'T'
-	addi $a0, $a0, 16
-	sw $a1,($a0)
-	sw $a1, 4($a0)
-	sw $a1, 8($a0)
-	sw $a1, 260($a0)
-	sw $a1, 516($a0)
-	sw $a1, 772($a0)
-	sw $a1, 1028($a0)
-	
-	beq $a2, 02, removed_lose
-	beq $a2, 12, removed_win
-	j end_screen
+	jr $ra
+
