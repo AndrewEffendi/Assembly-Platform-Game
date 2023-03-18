@@ -53,7 +53,6 @@
 .eqv	HEALTH_3	576
  
 .text
-
   # s0: health
   # s1: x coordinate
   # s2: y coordinate
@@ -220,7 +219,7 @@ paint_ground:
 	addi $a0, $a0, BASE_ADDRESS
     	li $t7, 0
 loop_ground:
-	bge $t7, 256, spike
+	bge $t7, 256, add_spike
 	li $t5, 4	  # 4 bytes
 	mul $t5, $t5, $t7 # offset = 4 bytes * index
 	add $t5, $t5, $a0 # t5 = address + offset
@@ -228,8 +227,10 @@ loop_ground:
     	addi $t7, $t7, 1
     	j loop_ground
  
-# spike function
-spike:	li $a3,0
+# ------------------------------------
+# add or remove spike
+add_spike:
+	li $a3,0 # indicate not remove_spike	
 	li $a1, COLOR_SPIKE
 	j s_skip
 remove_spike:
@@ -237,7 +238,7 @@ remove_spike:
 s_skip: beq $s7, 2, spike_lvl_2
 	beq $s7, 3, spike_lvl_3
 spike_lvl_1:
-	li $a2, 12 
+s_1_1:	li $a2, 12 
 	li $a0, SPIKE_1_1
 	j paint_spike
 s_1_2:	li $a2, 13
@@ -247,14 +248,14 @@ s_1_3:	li $a2, 0
 	li $a0, SPIKE_1_3
 	j paint_spike
 spike_lvl_2:
-	li $a2, 22
+s_2_1:	li $a2, 22
 	li $a0, SPIKE_2_1
 	j paint_spike
 s_2_2:	li $a2, 0
 	li $a0, SPIKE_2_2
 	j paint_spike
 spike_lvl_3:
-	li $a2, 32
+s_3_1:	li $a2, 32
 	li $a0, SPIKE_3_1
 	j paint_spike
 s_3_2:	li $a2, 0
@@ -286,11 +287,12 @@ paint_spike:
 	beq $a2, 22, s_2_2
 	beq $a2, 32, s_3_2
 	bnez $a3, remove_platform
-	j platform
+	j add_platform
 	
-# platform function
-platform: 
-	li $a3,0
+# ------------------------------------
+# add or remove platform
+add_platform: 
+	li $a3,0 # indicate not remove_platform
 	li $a1, COLOR_PLATFORM
 	j p_skip
 remove_platform:
@@ -298,21 +300,21 @@ remove_platform:
 p_skip:	beq $s7, 2, platform_lvl_2
 	beq $s7, 3, platform_lvl_3
 platform_lvl_1:
-	li $a2, 12
+p_1_1:	li $a2, 12
 	li $a0, PLATFORM_1_1
 	j paint_platform
 p_1_2:	li $a2, 0
 	li $a0, PLATFORM_1_2
 	j paint_platform
 platform_lvl_2:
-	li $a2, 22
+p_2_1:	li $a2, 22
 	li $a0, PLATFORM_2_1
 	j paint_platform
 p_2_2:	li $a2, 0
 	li $a0, PLATFORM_2_2
 	j paint_platform
 platform_lvl_3:
-	li $a2, 32
+p_3_1:	li $a2, 32
 	li $a0, PLATFORM_3_1
 	j paint_platform
 p_3_2:	li $a2, 33
@@ -350,11 +352,12 @@ end_loop_p:
 	beq $a2, 34, p_3_4
 	beq $a2, 35, p_3_5
 	bnez $a3, remove_monster
-	j monster
+	j add_monster
 	
-# monster function
-monster:
-	li $a3,0 # $s3: remove calling function, monster not remove
+# ------------------------------------
+# add or remove monster
+add_monster:
+	li $a3,0 	# $a3: remove calling function, monster not remove
 	li $a1, COLOR_MONSTER
 	j m_skip
 remove_monster:
@@ -364,7 +367,7 @@ m_skip:	beq $s7, 2, monster_lvl_2
 monster_lvl_1:
 	j skip_paint_monster # no monster for level 1
 monster_lvl_2:
-	li $a2, 22
+m_2_1:	li $a2, 22
 	li $a0, MONSTER_2_1
 	add $a0, $a0, $s4
 	j paint_monster
@@ -373,7 +376,7 @@ m_2_2:	li $a2, 0
 	add $a0, $a0, $s4
 	j paint_monster
 monster_lvl_3:
-	li $a2, 32
+m_3_1:	li $a2, 32
 	li $a0, MONSTER_3_1
 	add $a0, $a0, $s4
 	j paint_monster
@@ -421,28 +424,29 @@ skip_paint_monster:
 	beq $a3, 3, end_r_p_3
 	beq $a3, 4, end_r_p_4
 	beq $a3, 5, end_r_p_5
-	# move monster
-	beqz $s6, move_monster_next
-	j finish
+	beqz $s6, move_monster_next 	# move monster
+	j add_finish_line
 move_monster_next:	
 	li $t7, COLOR_BLACK	
 	beq $a1, $t7 , remove_monster_done	
 	j move_monster_done
 
-# finish line function
-finish:	li $a1, COLOR_FINISH
+# ------------------------------------
+# add finish line
+add_finish_line:
+	li $a1, COLOR_FINISH
 	beq $s7, 2, finish_lvl_2
 	beq $s7, 3, finish_lvl_3
 finish_lvl_1:
 	li $a0, FINISH_1
-	j paint_finish
+	j paint_finish_line
 finish_lvl_2:
 	li $a0, FINISH_2
-	j paint_finish
+	j paint_finish_line
 finish_lvl_3:
 	li $a0, FINISH_3
-	j paint_finish
-paint_finish:
+	j paint_finish_line
+paint_finish_line:
 	# $a0: position
 	# $a1: colour
 	addi $a0, $a0, BASE_ADDRESS
@@ -452,9 +456,25 @@ paint_finish:
 	sw $a1, 12($a0)
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
-	j health
+	j add_health
 
-# health function
+# ------------------------------------
+# add health
+add_health:	
+	li, $a1, COLOR_HEALTH
+	li $a2, 2
+	li, $a0, HEALTH_1
+	j paint_health
+h_2:	blt $s0, 2, paint_player #if health less than 2 don't paint
+	li $a2, 3
+	li, $a0, HEALTH_2
+	j paint_health
+h_3:	blt $s0, 3, paint_player #if health less than 3 don't paint
+	li $a2, 0
+	li, $a0, HEALTH_3
+	j paint_health
+
+# remove health	
 remove_health:
 	li, $a1, COLOR_BLACK
 	li $a2, 4
@@ -476,18 +496,7 @@ player_damaged:
 	beqz $s6, move_monster_done
 	j wait
 
-health:	li, $a1, COLOR_HEALTH
-	li $a2, 2
-	li, $a0, HEALTH_1
-	j paint_health
-h_2:	blt $s0, 2, player #if health less than 2 don't paint
-	li $a2, 3
-	li, $a0, HEALTH_2
-	j paint_health
-h_3:	blt $s0, 3, player #if health less than 3 don't paint
-	li $a2, 0
-	li, $a0, HEALTH_3
-	j paint_health
+# paint health	
 paint_health:
 	# $a0: position
 	# $a1: colour
@@ -509,12 +518,10 @@ paint_health:
 	beq $a2, 2, h_2
 	beq $a2, 3, h_3
 	beq $a2, 4, removed_health
-	j player
-	
-# player function
-# $a1 color 	
-player:
 	j paint_player
+	
+# ------------------------------------
+# paint player	
 paint_player:
 	li $t7, 64 	  	#t7 = 64
 	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
@@ -562,7 +569,9 @@ finished_check:
 	bne $t8 0x77, jump_check # w
 jump_checked:
 	j wait
-	
+
+# ------------------------------------
+# remove player	
 remove_player:
 	li $t7, 64 	  	#t7 = 64
 	mul $t7, $t7, $s2 	#t7 = 32*y
@@ -608,6 +617,8 @@ remove_player:
 	beq $t8, 0x6b, win   		# ASCII code of 'k' is 0x6b
 	beq $t8, 0x6c, lose   		# ASCII code of 'l' is 0x6c
 
+# ------------------------------------
+# damage player	
 damage_player:
 	li $t7, 64 	  	#t7 = 64
 	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
@@ -701,10 +712,10 @@ remove_monster_done:
 	j move_monster_left 
 move_monster_left:
 	addi $s4, $s4, -4 #move monster left
-	j monster
+	j add_monster
 move_monster_right:
 	addi $s4, $s4, 4 #move monster right
-	j monster
+	j add_monster
 move_monster_done:
 	li $s6, 1 # reset clock to 1
 	li $t8, 0x73
