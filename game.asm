@@ -270,33 +270,28 @@ remove_spike:
 s_skip: beq $s7, 2, spike_lvl_2
 	beq $s7, 3, spike_lvl_3
 spike_lvl_1:
-s_1_1:	li $a2, 12 
 	li $a0, SPIKE_1_1
-	j paint_spike
-s_1_2:	li $a2, 13
+	jal paint_spike
 	li $a0, SPIKE_1_2
-	j paint_spike
-s_1_3:	li $a2, 0
+	jal paint_spike
 	li $a0, SPIKE_1_3
-	j paint_spike
+	jal paint_spike
+	j paint_spike_done
 spike_lvl_2:
-s_2_1:	li $a2, 22
 	li $a0, SPIKE_2_1
-	j paint_spike
-s_2_2:	li $a2, 0
+	jal paint_spike
 	li $a0, SPIKE_2_2
-	j paint_spike
+	jal paint_spike
+	j paint_spike_done
 spike_lvl_3:
-s_3_1:	li $a2, 32
 	li $a0, SPIKE_3_1
-	j paint_spike
-s_3_2:	li $a2, 0
+	jal paint_spike
 	li $a0, SPIKE_3_2
-	j paint_spike
+	jal paint_spike
+	j paint_spike_done
 paint_spike:
 	# $a0: position
 	# $a1: colour
-	# $a2: next label
 	# $a3 remove calling level
 	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, 8($a0)
@@ -314,10 +309,8 @@ paint_spike:
 	sw $a1, 1032($a0)
 	sw $a1, 1036($a0)
 	sw $a1, 1040($a0)
-	beq $a2, 12, s_1_2
-	beq $a2, 13, s_1_3
-	beq $a2, 22, s_2_2
-	beq $a2, 32, s_3_2
+	jr $ra
+paint_spike_done:
 	bnez $a3, remove_platform
 	j add_platform
 	
@@ -332,39 +325,32 @@ remove_platform:
 p_skip:	beq $s7, 2, platform_lvl_2
 	beq $s7, 3, platform_lvl_3
 platform_lvl_1:
-p_1_1:	li $a2, 12
 	li $a0, PLATFORM_1_1
-	j paint_platform
-p_1_2:	li $a2, 0
+	jal paint_platform
 	li $a0, PLATFORM_1_2
-	j paint_platform
+	jal paint_platform
+	j paint_platform_done
 platform_lvl_2:
-p_2_1:	li $a2, 22
 	li $a0, PLATFORM_2_1
-	j paint_platform
-p_2_2:	li $a2, 0
+	jal paint_platform
 	li $a0, PLATFORM_2_2
-	j paint_platform
+	jal paint_platform
+	j paint_platform_done
 platform_lvl_3:
-p_3_1:	li $a2, 32
 	li $a0, PLATFORM_3_1
-	j paint_platform
-p_3_2:	li $a2, 33
+	jal paint_platform
 	li $a0, PLATFORM_3_2
-	j paint_platform
-p_3_3:	li $a2, 34
+	jal paint_platform
 	li $a0, PLATFORM_3_3
-	j paint_platform
-p_3_4:	li $a2, 35
+	jal paint_platform
 	li $a0, PLATFORM_3_4
-	j paint_platform
-p_3_5:	li $a2, 0
+	jal paint_platform
 	li $a0, PLATFORM_3_5
-	j paint_platform
+	jal paint_platform
+	j paint_platform_done
 paint_platform:
 	# $a0: position
 	# $a1: colour
-	# $a2: next label
 	# $a3 remove calling level
 	addi $a0, $a0, BASE_ADDRESS
     	li $t7, 0 # init t7 = 0
@@ -377,12 +363,8 @@ loop_platform:
     	addi $t7, $t7, 1
     	j loop_platform
 end_loop_p:
-	beq $a2, 12, p_1_2
-	beq $a2, 22, p_2_2
-	beq $a2, 32, p_3_2
-	beq $a2, 33, p_3_3
-	beq $a2, 34, p_3_4
-	beq $a2, 35, p_3_5
+	jr $ra
+paint_platform_done:
 	bnez $a3, remove_monster
 	j add_monster
 	
@@ -397,29 +379,26 @@ remove_monster:
 m_skip:	beq $s7, 2, monster_lvl_2
 	beq $s7, 3, monster_lvl_3
 monster_lvl_1:
-	j skip_paint_monster # no monster for level 1
+	j paint_monster_done # no monster for level 1
 monster_lvl_2:
-m_2_1:	li $a2, 22
 	li $a0, MONSTER_2_1
 	add $a0, $a0, $s4
-	j paint_monster
-m_2_2:	li $a2, 0
+	jal paint_monster
 	li $a0, MONSTER_2_2
 	add $a0, $a0, $s4
-	j paint_monster
+	jal paint_monster
+	j paint_monster_done
 monster_lvl_3:
-m_3_1:	li $a2, 32
 	li $a0, MONSTER_3_1
 	add $a0, $a0, $s4
-	j paint_monster
-m_3_2:	li $a2, 33
+	jal paint_monster
 	li $a0, MONSTER_3_2
 	add $a0, $a0, $s4
-	j paint_monster
-m_3_3:	li $a2, 0
+	jal paint_monster
 	li $a0, MONSTER_3_3
 	add $a0, $a0, $s4
-	j paint_monster
+	jal paint_monster
+	j paint_monster_done
 paint_monster:
 	# $a0: position
 	# $a1: colour
@@ -447,10 +426,8 @@ paint_monster:
 	sw $a1, 784($a0)
 	sw $a1, 1024($a0)
 	sw $a1, 1040($a0)
-	beq $a2, 22, m_2_2
-	beq $a2, 32, m_3_2
-	beq $a2, 33, m_3_3
-skip_paint_monster:
+	jr $ra
+paint_monster_done:
 	beq $a3, 1, end_r_p_1
 	beq $a3, 2, end_r_p_2
 	beq $a3, 3, end_r_p_3
@@ -494,37 +471,34 @@ paint_finish_line:
 # add health
 add_health:	
 	li, $a1, COLOR_HEALTH
-	li $a2, 2
 	li, $a0, HEALTH_1
-	j paint_health
+	jal paint_health
 h_2:	blt $s0, 2, paint_player #if health less than 2 don't paint
-	li $a2, 3
 	li, $a0, HEALTH_2
-	j paint_health
+	jal paint_health
 h_3:	blt $s0, 3, paint_player #if health less than 3 don't paint
-	li $a2, 0
 	li, $a0, HEALTH_3
-	j paint_health
+	jal paint_health
+	j paint_player
 
 # remove health	
 remove_health:
 	li, $a1, COLOR_BLACK
-	li $a2, 4
 	beq $s0, 3, rh_3
 	beq $s0, 2, rh_2
 	beq $s0, 1, rh_1
 	j respond_to_l
 rh_3:	li, $a0, HEALTH_3
-	j paint_health
-rh_2:	li, $a0, HEALTH_2
-	j paint_health
-rh_1:	li, $a0, HEALTH_1
-	j paint_health
-removed_health:
+	jal paint_health
 	j damage_player
+rh_2:	li, $a0, HEALTH_2
+	jal paint_health
+	j damage_player
+rh_1:	li, $a0, HEALTH_1
+	jal paint_health
+	j respond_to_l
 player_damaged:
 	addi $s0, $s0, -1 	# reduced health by 1
-	beqz $s0, respond_to_l 	# if 0 heart, lose
 	beqz $s6, move_monster_done
 	j wait
 
@@ -547,10 +521,7 @@ paint_health:
 	sw $a1, 520($a0)
 	sw $a1, 524($a0)
 	sw $a1, 776($a0)
-	beq $a2, 2, h_2
-	beq $a2, 3, h_3
-	beq $a2, 4, removed_health
-	j paint_player
+	jr $ra
 	
 # ------------------------------------
 # paint player	
