@@ -65,25 +65,158 @@
   # t0: jump counter
   # t8: previouse pressed key
  	
-reset:	li $s0, 3 # health
-	li $s7, 1 # level
+reset:	li $s0, 3 	# health
+	li $s7, 1 	# level
 
 next_level:
- 	li $s1, 0 # player's x-coordinate
- 	li $s2, 204 # player's y-coordinate
- 	li $s3, 2 # double jump
- 	li $s4, 0 # 0 to 40 range
- 	li $s5, 0 # 0 right, 1 left
- 	li $s6, 1 # reset clock to 1
- 	li $t0, 0 # jump counter
-
-# ground function
-ground:	li $a1, COLOR_GROUND
-	li $a0, GROUND
+ 	li $s1, 0 	# player's x-coordinate
+ 	li $s2, 204 	# player's y-coordinate
+ 	li $s3, 2 	# double jump
+ 	li $s4, 0 	# 0 to 40 range
+ 	li $s5, 0 	# 0 right, 1 left
+ 	li $s6, 1 	# reset clock to 1
+ 	li $t0, 0 	# jump counter
  	j paint_ground
+ 
+ wait:
+ 	# Wait 1for key press
+ 	li $t9, 0xffff0000  
+	lw $t8, 0($t9) 
+	beq $t8, 1, keypress_happened 
+	
+	# every 0.5 got to wait_second to update gravity and move monster
+	addi $s6, $s6, 1
+	beq $s6, 50, wait_second 
+	
+	# Wait 10 milliseconds (60 hz)
+	li $v0, 32 
+	li $a0, 10    
+	syscall 
+	j wait
+
+# ------------------------------------
+# handle keypresses
+keypress_happened :	
+	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
+	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
+	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
+	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
+	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
+	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
+	beq $t8, 0x31, respond_to_1   # ASCII code of '1' is 0x31
+	beq $t8, 0x32, respond_to_2   # ASCII code of '2' is 0x32
+	beq $t8, 0x33, respond_to_3   # ASCII code of '3' is 0x32
+	beq $t8, 0x6b, respond_to_k   # ASCII code of 'k' is 0x6b to be remove
+	beq $t8, 0x6c, respond_to_l   # ASCII code of 'l' is 0x6c to be remove
+	j wait
+
+# ------------------------------------
+# w keypress
+respond_to_w:
+	beq $s3, 0, wait # jump not available
+	addi $s3, $s3, -1 #reduce jump
+	li $t0, 1
+	j jump_loop
+jump_2: li $t0, 2
+	j jump_loop
+jump_3: li $t0, 3
+	j jump_loop
+jump_4: li $t0, 4
+	j jump_loop
+jump_5: li $t0, 0
+	j jump_loop
+jump_loop:
+	j collision_check
+jump:	addi $s2, $s2, -4 	# y-1
+	bge $s2, 40, paint_player
+	li $s2, 40 		# cap y >= 40
+	j paint_player
+
+# ------------------------------------
+# a keypress
+respond_to_a:
+	j collision_check
+left:	addi $s1, $s1, -4 	# x-4
+	bgez $s1, paint_player
+	li $s1, 0 		# cap x >= 0
+	j paint_player
+
+# ------------------------------------
+# s keypress
+respond_to_s:
+	j collision_check
+gravity:	
+	addi $s2, $s2, 4 	# y+1
+	ble $s2, 204, paint_player
+	li $s2, 204 		# cap y <= 204
+	j paint_player
+
+# ------------------------------------
+# d keypress
+respond_to_d:
+	j collision_check
+right: 	addi $s1, $s1, 4 	# x+4
+	ble $s1, 236, paint_player
+	li $s1, 236 		# cap x >= 0
+	j paint_player
+
+# ------------------------------------
+# p keypress
+respond_to_p:
+	j remove_win
+removed_win:
+	j remove_lose
+removed_lose:
+	li $t8, 0x31 
+	j respond_to_1
+
+# ------------------------------------
+# 1 keypress
+respond_to_1:
+	li $s0, 3 # set health to 3
+	li $a3, 1
+	li $t8, 0x31
+	j remove_spike
+end_r_p_1:
+	li $s7, 1
+	j remove_player
+
+# ------------------------------------
+# 2 keypress
+respond_to_2:
+	li $a3, 2
+	li $t8, 0x32
+	j remove_spike
+end_r_p_2:
+	li $s7, 2
+	j remove_player
+
+# ------------------------------------
+# 3 keypress	
+respond_to_3:
+	li $a3, 3
+	li $t8, 0x33
+	j remove_spike
+end_r_p_3:
+	li $s7, 3
+	j remove_player	
+
+# ------------------------------------
+# Exit
+Exit:
+ 	li $v0, 10 # terminate the program gracefully 
+ 	syscall 
+
+#####################################################################
+#                        my functions                               #
+#####################################################################
+# ------------------------------------
+# paint ground
 paint_ground:
 	# $a0: position
 	# $a1: colour
+	li $a1, COLOR_GROUND
+	li $a0, GROUND
 	addi $a0, $a0, BASE_ADDRESS
     	li $t7, 0
 loop_ground:
@@ -546,18 +679,6 @@ damage_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7) 
 	j player_damaged
-	
-wait:
- 	li $t9, 0xffff0000  
-	lw $t8, 0($t9) 
-	beq $t8, 1, keypress_happened 
-	
-	addi $s6, $s6, 1
-	beq $s6, 50, wait_second #0.5 second
-	li $v0, 32 
-	li $a0, 10   # Wait 10 milliseconds 
-	syscall 
-	j wait
 
 wait_second:
 	li $s6, 0 # reset clock to 0
@@ -638,62 +759,6 @@ check_mm:
 	beq $a3, 32, ml32
 	beq $a3, 33, ml33
 	j update_monster
-	
-keypress_happened :	
-	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
-	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
-	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
-	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
-	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
-	beq $t8, 0x31, respond_to_1   # ASCII code of '1' is 0x31
-	beq $t8, 0x32, respond_to_2   # ASCII code of '2' is 0x32
-	beq $t8, 0x33, respond_to_3   # ASCII code of '3' is 0x32
-	beq $t8, 0x6b, respond_to_k   # ASCII code of 'k' is 0x6b
-	beq $t8, 0x6c, respond_to_l   # ASCII code of 'l' is 0x6c
-	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
-	j wait
-
-respond_to_w:
-	beq $s3, 0, wait # jump not available
-	addi $s3, $s3, -1 #reduce jump
-	li $t0, 1
-	j jump_loop
-jump_2: li $t0, 2
-	j jump_loop
-jump_3: li $t0, 3
-	j jump_loop
-jump_4: li $t0, 4
-	j jump_loop
-jump_5: li $t0, 0
-	j jump_loop
-jump_loop:
-	j collision_check
-jump:	addi $s2, $s2, -4 	# y-1
-	bge $s2, 40, paint_player
-	li $s2, 40 		# cap y >= 40
-	j paint_player
-	
-respond_to_a:
-	j collision_check
-left:	addi $s1, $s1, -4 	# x-4
-	bgez $s1, paint_player
-	li $s1, 0 		# cap x >= 0
-	j paint_player
-	
-respond_to_s:
-	j collision_check
-gravity:	
-	addi $s2, $s2, 4 	# y+1
-	ble $s2, 204, paint_player
-	li $s2, 204 		# cap y <= 204
-	j paint_player
-
-respond_to_d:
-	j collision_check
-right: 	addi $s1, $s1, 4 	# x+4
-	ble $s1, 236, paint_player
-	li $s1, 236 		# cap x >= 0
-	j paint_player
 	
 jump_check:
 	# player location
@@ -1017,43 +1082,6 @@ collision_checked:
 damaged:
 	j remove_health
 	
-respond_to_1:
-	li $s0, 3 # set health to 3
-	li $a3, 1
-	li $t8, 0x31
-	j remove_spike
-end_r_p_1:
-	li $s7, 1
-	j remove_player
-	
-respond_to_2:
-	li $a3, 2
-	li $t8, 0x32
-	j remove_spike
-end_r_p_2:
-	li $s7, 2
-	j remove_player
-	
-respond_to_3:
-	li $a3, 3
-	li $t8, 0x33
-	j remove_spike
-end_r_p_3:
-	li $s7, 3
-	j remove_player	
-	
-#p
-respond_to_p:
-	j remove_win
-removed_win:
-	j remove_lose
-removed_lose:
-	li $t8, 0x31 
-	j respond_to_1
-
-Exit:
- 	li $v0, 10 # terminate the program gracefully 
- 	syscall 
 end_screen:
 	li $t9, 0xffff0000  
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
