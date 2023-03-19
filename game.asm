@@ -547,7 +547,6 @@ rh_1:	li, $a0, HEALTH_1
 paint_health:
 	# $a0: position
 	# $a1: colour
-	# $s2: next label
 	addi $a0, $a0, BASE_ADDRESS
 	sw $a1, ($a0)
 	sw $a1, 4($a0)
@@ -682,7 +681,7 @@ damage_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
 	li $v0, 32 
-	li $a0, 100   	# Wait 100 milliseconds 
+	li $a0, 100   		# Wait 100 milliseconds 
 	syscall 
 	jal paint_player
 	addi $s0, $s0, -1 	# reduced health by 1
@@ -753,9 +752,9 @@ jump_check_ground:
     	li $t7, 0
 loop_jcg:
 	bge $t7, 64, end_loop_jcg
-	li $t5, 4	  # 4 bytes
-	mul $t5, $t5, $t7 # offset = 4 bytes * index
-	add $t5, $t5, $t6 # t5 = address + offset
+	li $t5, 4	  	# 4 bytes
+	mul $t5, $t5, $t7 	# offset = 4 bytes * index
+	add $t5, $t5, $t6 	# t5 = address + offset
 	beq $t5, $a0 double_jump_reset
     	addi $t7, $t7, 1
     	j loop_jcg
@@ -789,12 +788,12 @@ jump_check_3:
 	jal jump_check_patform
 	j jump_checked
 jump_check_patform:
-	li $t7, -2 # init t7 = 0
+	li $t7, -2 		# init t7 = 0
 loop_jcp:
 	bge $t7, 15, end_loop_jcp
-	li $t5, 4	  # 4 bytes
-	mul $t5, $t5, $t7 # offset = 4 bytes * index
-	add $t5, $t5, $a1 # t5 = address + offset
+	li $t5, 4	  	# 4 bytes
+	mul $t5, $t5, $t7 	# offset = 4 bytes * index
+	add $t5, $t5, $a1 	# t5 = address + offset
 	beq $t5, $a0 double_jump_reset
     	addi $t7, $t7, 1
     	j loop_jcp
@@ -879,15 +878,15 @@ platform_check_3:
 	j platform_checked
 platform_checked:
 	jal remove_player
-	beq $t8, 0x77, jump   		# ASCII code of 'w' is 0x77 
-	beq $t8, 0x61, left   		# ASCII code of 'a' is 0x61
-	beq $t8, 0x73, down  		# ASCII code of 's' is 0x73 
+	beq $t8, 0x77, jump   	# ASCII code of 'w' is 0x77 
+	beq $t8, 0x61, left   	# ASCII code of 'a' is 0x61
+	beq $t8, 0x73, down  	# ASCII code of 's' is 0x73 
 	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
 
 check_mtp:
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
+	li $a0, 64 	  		#t7 = 64
+	mul $a0, $a0, $s2 		#t7 = 32*y
+	add $a0, $s1, $a0 		#t7 = x + 32*y
 	addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
 	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
@@ -937,7 +936,6 @@ collision_check:
 	beq $s7, 1, collision_check_1
 	beq $s7, 2, collision_check_2
 	j collision_check_3
-#$a3, next label
 # check collission for lvl 1
 collision_check_1:
 	li $a1, SPIKE_1_1 
@@ -1074,15 +1072,12 @@ remove_lose:
 	li $a1, COLOR_BLACK
 	li $a2, 02
 	j wl_start
-
 # ------------------------------------
 # start painting end screen message
 wl_start:
 	li $a0, BASE_ADDRESS
 	addi $a0, $a0, 3152
 	j paint_you
-
-
 # ------------------------------------
 # paint 'YOU'	
 paint_you:
@@ -1094,7 +1089,6 @@ paint_you:
 	beq $a2, 01, paint_lose
 	beq $a2, 02, paint_lose
 	j paint_win
-
 # ------------------------------------
 # paint 'LOSE'	
 paint_lose:
@@ -1107,7 +1101,6 @@ paint_lose:
 	addi $a0, $a0, 32
 	jal paint_big_E
 	j press_p_to_restart
-
 # ------------------------------------
 # paint 'WIN'	
 paint_win:
@@ -1121,7 +1114,6 @@ paint_win:
 	addi $a0, $a0, 16
 	jal paint_big_N
 	j press_p_to_restart
-
 # ------------------------------------
 # paint press p to restart	
 press_p_to_restart:
@@ -1171,7 +1163,6 @@ pptr_start:
 	beq $a2, 02, removed_lose
 	beq $a2, 12, removed_win
 	j end_screen
-
 # ------------------------------------
 # paint big letters
 paint_big_E:
@@ -1600,4 +1591,3 @@ paint_T:
 	sw $a1, 772($a0)
 	sw $a1, 1028($a0)
 	jr $ra
-
