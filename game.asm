@@ -1,12 +1,38 @@
-# Bitmap display starter code 
+##################################################################### 
+# 
+# CSCB58 Winter 2023 Assembly Final Project 
+# University of Toronto, Scarborough 
+# 
+# Student: Name, Student Number, UTorID, official email 
 # 
 # Bitmap Display Configuration: 
-# - Unit width in pixels: 8           
-# - Unit height in pixels: 8 
-# - Display width in pixels: 512 
-# - Display height in pixels: 512 
+# - Unit width in pixels: 8 (update this as needed)  
+# - Unit height in pixels: 8 (update this as needed) 
+# - Display width in pixels: 512 (update this as needed) 
+# - Display height in pixels: 512 (update this as needed) 
 # - Base Address for Display: 0x10008000 ($gp) 
 # 
+# Which milestones have been reached in this submission? 
+# - Milestone 3
+# 
+# Which approved features have been implemented for milestone 3? 
+# 1. Health/score [2 marks]
+# 2. Fail condition [1 mark] 
+# 3. Win condition [1 mark]
+# 4. Moving objects [2 mark]
+# 5. Different levels [2 marks]
+# 6. Double jump [1 mark]
+# 
+# Link to video demonstration for final submission: 
+# - (insert YouTube / MyMedia / other URL here). Make sure we can view it! 
+# 
+# Are you OK with us sharing the video with people outside course staff? 
+# - yes / no / yes, and please share this project github link as well! 
+# 
+# Any additional information that the TA needs to know: 
+# - (write here, if any) 
+# 
+##################################################################### 
 .eqv  	BASE_ADDRESS	0x10008000 
 .eqv	COLOR_SPIKE	0xaaa9ad
 .eqv	COLOR_MONSTER	0xa64320
