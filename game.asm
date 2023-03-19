@@ -140,7 +140,7 @@ keypress_happened :
 respond_to_w:
 	beq $s3, 0, wait # jump not available
 	addi $s3, $s3, -1 #reduce jump
-	li $t0, 1
+jump_1:	li $t0, 1
 	j jump_loop
 jump_2: li $t0, 2
 	j jump_loop
@@ -151,10 +151,10 @@ jump_4: li $t0, 4
 jump_5: li $t0, 0
 	j jump_loop
 jump_loop:
+	ble $s2, 40, wait
 	j collision_check
-jump:	addi $s2, $s2, -4 	# y-1
-	bge $s2, 40, paint_player
-	li $s2, 40 		# cap y >= 40
+jump:	
+	addi $s2, $s2, -4 	# y-1
 	j paint_player
 
 # ------------------------------------
