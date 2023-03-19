@@ -3,7 +3,7 @@
 # CSCB58 Winter 2023 Assembly Final Project 
 # University of Toronto, Scarborough 
 # 
-# Student: Name, Student Number, UTorID, official email 
+# Student: Andrew EFfendi, 1007141594, Effendia, a.effendi@mail.utoronto.ca
 # 
 # Bitmap Display Configuration: 
 # - Unit width in pixels: 8 (update this as needed)  
@@ -160,29 +160,28 @@ jump:	addi $s2, $s2, -4 	# y-1
 # ------------------------------------
 # a keypress
 respond_to_a:
+	blez $s1, wait
 	j collision_check
-left:	addi $s1, $s1, -4 	# x-4
-	bgez $s1, paint_player
-	li $s1, 0 		# cap x >= 0
+left:	
+	addi $s1, $s1, -4 	# x-4
 	j paint_player
 
 # ------------------------------------
 # s keypress
 respond_to_s:
+	bge $s2, 204, wait
 	j collision_check
-gravity:	
-	addi $s2, $s2, 4 	# y+1
-	ble $s2, 204, paint_player
-	li $s2, 204 		# cap y <= 204
+down:	
+	addi $s2, $s2, 4 	# y+4
 	j paint_player
 
 # ------------------------------------
 # d keypress
 respond_to_d:
+	bge $s1, 236, wait
 	j collision_check
-right: 	addi $s1, $s1, 4 	# x+4
-	ble $s1, 236, paint_player
-	li $s1, 236 		# cap x >= 0
+right: 	
+	addi $s1, $s1, 4 	# x+4
 	j paint_player
 
 # ------------------------------------
@@ -638,7 +637,7 @@ remove_player:
 	sw $a1, 1804($t7)
 	beq $t8, 0x77, jump   		# ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, left   		# ASCII code of 'a' is 0x61
-	beq $t8, 0x73, gravity  	# ASCII code of 's' is 0x73 
+	beq $t8, 0x73, down  		# ASCII code of 's' is 0x73 
 	beq $t8, 0x64, right   		# ASCII code of 'd' is 0x64
 	beq $t8, 0x31, next_level   	# ASCII code of '31' is 0x64
 	beq $t8, 0x32, next_level  	# ASCII code of '32' is 0x64
