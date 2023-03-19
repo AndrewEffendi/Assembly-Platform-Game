@@ -89,10 +89,13 @@
   # s7: level
   # t0: jump counter
   # t8: previouse pressed key
- 	
+
+# ------------------------------------
+# initialize program global variable	
 reset:	li $s0, 3 	# health
 	li $s7, 1 	# level
-
+# ------------------------------------
+# initialize global variable for next level
 next_level:
  	li $s1, 0 	# player's x-coordinate
  	li $s2, 204 	# player's y-coordinate
@@ -102,8 +105,9 @@ next_level:
  	li $s6, 1 	# reset clock to 1
  	li $t0, 0 	# jump counter
  	j paint_ground
- 
- wait:
+# ------------------------------------
+# main loop
+wait:
  	# Wait 1for key press
  	li $t9, 0xffff0000  
 	lw $t8, 0($t9) 
@@ -118,7 +122,6 @@ next_level:
 	li $a0, 10    
 	syscall 
 	j wait
-
 # ------------------------------------
 # handle keypresses
 keypress_happened :	
@@ -134,7 +137,6 @@ keypress_happened :
 	beq $t8, 0x6b, respond_to_k   # ASCII code of 'k' is 0x6b to be remove
 	beq $t8, 0x6c, respond_to_l   # ASCII code of 'l' is 0x6c to be remove
 	j wait
-
 # ------------------------------------
 # w keypress
 respond_to_w:
@@ -153,37 +155,29 @@ jump_5: li $t0, 0
 jump_loop:
 	ble $s2, 40, wait
 	j collision_check
-jump:	
-	addi $s2, $s2, -4 	# y-1
+jump:	addi $s2, $s2, -4 	# y-1
 	j move_player
-
 # ------------------------------------
 # a keypress
 respond_to_a:
 	blez $s1, wait
 	j collision_check
-left:	
-	addi $s1, $s1, -4 	# x-4
+left:	addi $s1, $s1, -4 	# x-4
 	j move_player
-
 # ------------------------------------
 # s keypress
 respond_to_s:
 	bge $s2, 204, wait
 	j collision_check
-down:	
-	addi $s2, $s2, 4 	# y+4
+down:	addi $s2, $s2, 4 	# y+4
 	j move_player
-
 # ------------------------------------
 # d keypress
 respond_to_d:
 	bge $s1, 236, wait
 	j collision_check
-right: 	
-	addi $s1, $s1, 4 	# x+4
+right: 	addi $s1, $s1, 4 	# x+4
 	j move_player
-	
 # ------------------------------------
 # move player
 move_player:
@@ -198,7 +192,6 @@ finished_check:
 	bne $t8 0x77, jump_check # w
 jump_checked:
 	j wait
-
 # ------------------------------------
 # p keypress
 respond_to_p:
@@ -208,7 +201,6 @@ removed_win:
 removed_lose:
 	li $t8, 0x31 
 	j respond_to_1
-
 # ------------------------------------
 # 1 keypress
 respond_to_1:
@@ -220,7 +212,6 @@ end_r_p_1:
 	li $s7, 1
 	jal remove_player
 	j next_level
-
 # ------------------------------------
 # 2 keypress
 respond_to_2:
@@ -231,7 +222,6 @@ end_r_p_2:
 	li $s7, 2
 	jal remove_player
 	j next_level
-
 # ------------------------------------
 # 3 keypress	
 respond_to_3:
@@ -242,7 +232,6 @@ end_r_p_3:
 	li $s7, 3
 	jal remove_player
 	j next_level	
-
 # ------------------------------------
 # what happen every 0.5 seconds
 half_second:
@@ -274,7 +263,6 @@ move_monster_done:
 	li $s6, 1 # reset clock to 1
 	li $t8, 0x73
 	j respond_to_s #go down once
-
 # ------------------------------------
 # Exit
 Exit:
@@ -301,7 +289,6 @@ loop_ground:
 	sw $a1, ($t5)
     	addi $t7, $t7, 1
     	j loop_ground
- 
 # ------------------------------------
 # add or remove spike
 add_spike:
@@ -356,7 +343,6 @@ paint_spike:
 paint_spike_done:
 	bnez $a3, remove_platform
 	j add_platform
-	
 # ------------------------------------
 # add or remove platform
 add_platform: 
@@ -410,7 +396,6 @@ end_loop_p:
 paint_platform_done:
 	bnez $a3, remove_monster
 	j add_monster
-	
 # ------------------------------------
 # add or remove monster
 add_monster:
@@ -482,7 +467,6 @@ move_monster_next:
 	li $t7, COLOR_BLACK	
 	beq $a1, $t7 , remove_monster_done	
 	j move_monster_done
-
 # ------------------------------------
 # add finish line
 add_finish_line:
@@ -509,7 +493,6 @@ paint_finish_line:
 	sw $a1, 16($a0)
 	sw $a1, 20($a0)
 	j add_health
-
 # ------------------------------------
 # add health
 add_health:	
@@ -525,7 +508,6 @@ h_3:	blt $s0, 3, add_health_done #if health less than 3 don't paint
 add_health_done:
 	jal paint_player
 	j wait
-
 # remove health	
 remove_health:
 	li, $a1, COLOR_BLACK
@@ -542,7 +524,6 @@ rh_2:	li, $a0, HEALTH_2
 rh_1:	li, $a0, HEALTH_1
 	jal paint_health
 	j respond_to_l
-
 # paint health	
 paint_health:
 	# $a0: position
@@ -562,7 +543,6 @@ paint_health:
 	sw $a1, 524($a0)
 	sw $a1, 776($a0)
 	jr $ra
-	
 # ------------------------------------
 # paint player	
 paint_player:
@@ -603,7 +583,6 @@ paint_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
 	jr $ra
-
 # ------------------------------------
 # remove player	
 remove_player:
@@ -642,7 +621,6 @@ remove_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
 	jr $ra
-
 # ------------------------------------
 # damage player	
 damage_player:
@@ -736,8 +714,6 @@ check_mm:
 	addi $t7, $t7, -256 #move monster up
 	beq $a0, $t7, remove_health
 	jr $ra
-	
-
 # ------------------------------------
 # check double jump	
 jump_check:
@@ -802,7 +778,6 @@ end_loop_jcp:
 double_jump_reset:
 	li $s3, 2
 	j jump_checked
-
 # ------------------------------------
 # check player at finish line
 finish_check:
@@ -845,7 +820,6 @@ finish_check_3:
 	addi $t6, $t6, 4
 	beq $a0, $t6, respond_to_k
 	j finished_check
-
 # ------------------------------------
 # check platform collision
 platform_check:
@@ -929,7 +903,6 @@ csp: 	addi $a1, $a1, 72
 	ble $a0, $a1, wait
 sp_check_next:
 	jr $ra
-
 # ------------------------------------
 # check monster and spike collision	
 collision_check:
@@ -1031,7 +1004,6 @@ end_screen:
 	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	j end_screen
-
 # ------------------------------------
 # win end screen 
 respond_to_k:
@@ -1042,7 +1014,6 @@ end_r_p_4:
 	li $s7, 3
 	jal remove_player
 	j win	
-
 # lose end screen 
 respond_to_l:
 	li $t8, 0x6c
@@ -1052,7 +1023,6 @@ end_r_p_5:
 	li $s7, 3
 	jal remove_player
 	j lose
-
 # ------------------------------------
 # paint win
 win:	li $a1, COLOR_FINISH
