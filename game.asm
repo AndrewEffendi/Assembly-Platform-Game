@@ -869,7 +869,7 @@ check_mtp:
 # offset for each movement type
 wp_offset:
 	addi $a0, $a0, -244  	#t7 + 8 row below + 5 cell righ
-	j sp_check
+	j horizontal_p_check
 ap_offset:
 	addi $a0, $a0, 1988  	#t7 + 8 row below + 5 cell left
 	j vertical_p_check
@@ -878,7 +878,7 @@ dp_offset:
 	j vertical_p_check
 sp_offset:
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
-	j sp_check
+	j horizontal_p_check
 # vertical (y -axis) platform collision check
 vertical_p_check:
 	addi $a1, $a1, BASE_ADDRESS
@@ -892,14 +892,15 @@ loop_vpc:
 end_loop_vpc:
 	jr $ra
 # horizontal (x -axis) platform collision check
-sp_check:
+horizontal_p_check:
 	addi $a1, $a1,-4 	#shift left once
 	addi $a1, $a1, BASE_ADDRESS
-	bge $a0, $a1, csp
-	j sp_check_next
-csp: 	addi $a1, $a1, 72
+	bge $a0, $a1, hcp_and
+	j end_hcp
+hcp_and:
+	addi $a1, $a1, 72
 	ble $a0, $a1, wait
-sp_check_next:
+end_hcp:
 	jr $ra
 # ------------------------------------
 # check monster and spike collision	
@@ -945,7 +946,6 @@ collision_check_3:
 	add $a1, $a1, $s4
 	jal check_mt
 	j platform_check
-
 #check movement type
 check_mt:
 	li $a0, 64 	  	#t7 = 64
@@ -965,7 +965,7 @@ d_offset:
 	j vertical_check
 s_offset:
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
-	j s_check
+	j horizontal_check
 # vertical (y -axis) platform collision check	
 vertical_check:
 	addi $a1, $a1, BASE_ADDRESS
@@ -980,15 +980,16 @@ loop_vc:
 end_loop_vc:
 	jr $ra
 # horizontal (x -axis) platform collision check	
-s_check:
+horizontal_check:
 	addi $a1, $a1,-4 #shift left once
 	add $a1, $a1, BASE_ADDRESS
-	bge $a0, $a1, cs
-	j s_check_next
-cs: 	addi $a1, $a1, 32
+	bge $a0, $a1, hc_and
+	j end_hc
+hc_and: 
+	addi $a1, $a1, 32
 	# here damage
 	ble $a0, $a1, remove_health
-s_check_next:
+end_hc:
 	jr $ra
 	
 #####################################################################
