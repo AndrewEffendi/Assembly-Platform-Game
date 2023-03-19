@@ -203,7 +203,8 @@ respond_to_1:
 	j remove_spike
 end_r_p_1:
 	li $s7, 1
-	j remove_player
+	jal remove_player
+	j next_level
 
 # ------------------------------------
 # 2 keypress
@@ -213,7 +214,8 @@ respond_to_2:
 	j remove_spike
 end_r_p_2:
 	li $s7, 2
-	j remove_player
+	jal remove_player
+	j next_level
 
 # ------------------------------------
 # 3 keypress	
@@ -223,7 +225,8 @@ respond_to_3:
 	j remove_spike
 end_r_p_3:
 	li $s7, 3
-	j remove_player	
+	jal remove_player
+	j next_level	
 
 # ------------------------------------
 # what happen every 0.5 seconds
@@ -635,15 +638,7 @@ remove_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
-	beq $t8, 0x77, jump   		# ASCII code of 'w' is 0x77 
-	beq $t8, 0x61, left   		# ASCII code of 'a' is 0x61
-	beq $t8, 0x73, down  		# ASCII code of 's' is 0x73 
-	beq $t8, 0x64, right   		# ASCII code of 'd' is 0x64
-	beq $t8, 0x31, next_level   	# ASCII code of '31' is 0x64
-	beq $t8, 0x32, next_level  	# ASCII code of '32' is 0x64
-	beq $t8, 0x33, next_level   	# ASCII code of '33' is 0x64
-	beq $t8, 0x6b, win   		# ASCII code of 'k' is 0x6b
-	beq $t8, 0x6c, lose   		# ASCII code of 'l' is 0x6c
+	jr $ra
 
 # ------------------------------------
 # damage player	
@@ -888,13 +883,13 @@ platform_check_1:
 	jal check_mtp
 	li $a1, PLATFORM_1_2
 	jal check_mtp
-	j remove_player
+	j platform_checked
 platform_check_2:
 	li $a1, PLATFORM_2_1 
 	jal check_mtp
 	li $a1, PLATFORM_2_2
 	jal check_mtp
-	j remove_player
+	j platform_checked
 platform_check_3:
 	li $a1, PLATFORM_3_1 
 	jal check_mtp
@@ -906,7 +901,13 @@ platform_check_3:
 	jal check_mtp
 	li $a1, PLATFORM_3_5 
 	jal check_mtp
-	j remove_player
+	j platform_checked
+platform_checked:
+	jal remove_player
+	beq $t8, 0x77, jump   		# ASCII code of 'w' is 0x77 
+	beq $t8, 0x61, left   		# ASCII code of 'a' is 0x61
+	beq $t8, 0x73, down  		# ASCII code of 's' is 0x73 
+	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
 
 check_mtp:
 	li $a0, 64 	  	#t7 = 64
@@ -1066,7 +1067,8 @@ respond_to_k:
 	j remove_spike
 end_r_p_4:
 	li $s7, 3
-	j remove_player	
+	jal remove_player
+	j win	
 
 # lose end screen 
 respond_to_l:
@@ -1075,7 +1077,8 @@ respond_to_l:
 	j remove_spike
 end_r_p_5:
 	li $s7, 3
-	j remove_player
+	jal remove_player
+	j lose
 
 # ------------------------------------
 # paint win
