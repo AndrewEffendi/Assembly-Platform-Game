@@ -155,7 +155,7 @@ jump_loop:
 	j collision_check
 jump:	
 	addi $s2, $s2, -4 	# y-1
-	j paint_player
+	j move_player
 
 # ------------------------------------
 # a keypress
@@ -164,7 +164,7 @@ respond_to_a:
 	j collision_check
 left:	
 	addi $s1, $s1, -4 	# x-4
-	j paint_player
+	j move_player
 
 # ------------------------------------
 # s keypress
@@ -173,7 +173,7 @@ respond_to_s:
 	j collision_check
 down:	
 	addi $s2, $s2, 4 	# y+4
-	j paint_player
+	j move_player
 
 # ------------------------------------
 # d keypress
@@ -182,7 +182,22 @@ respond_to_d:
 	j collision_check
 right: 	
 	addi $s1, $s1, 4 	# x+4
-	j paint_player
+	j move_player
+	
+# ------------------------------------
+# move player
+move_player:
+	jal paint_player
+jump_count:
+	beq $t0, 1, jump_2
+	beq $t0, 2, jump_3
+	beq $t0, 3, jump_4
+	beq $t0, 4, jump_5
+	j finish_check
+finished_check:
+	bne $t8 0x77, jump_check # w
+jump_checked:
+	j wait
 
 # ------------------------------------
 # p keypress
@@ -501,13 +516,15 @@ add_health:
 	li, $a1, COLOR_HEALTH
 	li, $a0, HEALTH_1
 	jal paint_health
-h_2:	blt $s0, 2, paint_player #if health less than 2 don't paint
+h_2:	blt $s0, 2, add_health_done #if health less than 2 don't paint
 	li, $a0, HEALTH_2
 	jal paint_health
-h_3:	blt $s0, 3, paint_player #if health less than 3 don't paint
+h_3:	blt $s0, 3, add_health_done #if health less than 3 don't paint
 	li, $a0, HEALTH_3
 	jal paint_health
-	j paint_player
+add_health_done:
+	jal paint_player
+	j wait
 
 # remove health	
 remove_health:
@@ -590,16 +607,7 @@ paint_player:
 	sw $a1, 1796($t7)
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
-jump_count:
-	beq $t0, 1, jump_2
-	beq $t0, 2, jump_3
-	beq $t0, 3, jump_4
-	beq $t0, 4, jump_5
-	j finish_check
-finished_check:
-	bne $t8 0x77, jump_check # w
-jump_checked:
-	j wait
+	jr $ra
 
 # ------------------------------------
 # remove player	
