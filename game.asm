@@ -542,10 +542,6 @@ rh_2:	li, $a0, HEALTH_2
 rh_1:	li, $a0, HEALTH_1
 	jal paint_health
 	j respond_to_l
-player_damaged:
-	addi $s0, $s0, -1 	# reduced health by 1
-	beqz $s6, move_monster_done
-	j wait
 
 # paint health	
 paint_health:
@@ -686,41 +682,12 @@ damage_player:
 	sw $a1, 1800($t7)
 	sw $a1, 1804($t7)
 	li $v0, 32 
-	li $a0, 100   # Wait 100 milliseconds 
+	li $a0, 100   	# Wait 100 milliseconds 
 	syscall 
-	li $a1, COLOR_RED
-	sw $a1, 4($t7)
-	sw $a1, 8($t7)
-	sw $a1, 12($t7)
-	sw $a1, 260($t7)
-	sw $a1, 264($t7)
-	sw $a1, 268($t7)
-	sw $a1, 272($t7)
-	sw $a1, 1028($t7)
-	sw $a1, 1036($t7)
-	li $a1, COLOR_CREAM
-	sw $a1, 516($t7)
-	sw $a1, 520($t7)
-	sw $a1, 524($t7)
-	sw $a1, 772($t7)
-	sw $a1, 776($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1024($t7)
-	sw $a1, 1040($t7)
-	sw $a1, 2052($t7)
-	sw $a1, 2060($t7)
-	li $a1, COLOR_BLUE
-	sw $a1, 1032($t7)
-	sw $a1, 1284($t7)
-	sw $a1, 1288($t7)
-	sw $a1, 1292($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
-	sw $a1, 1548($t7)
-	sw $a1, 1796($t7)
-	sw $a1, 1800($t7)
-	sw $a1, 1804($t7) 
-	j player_damaged
+	jal paint_player
+	addi $s0, $s0, -1 	# reduced health by 1
+	beqz $s6, move_monster_done
+	j wait
 
 #####################################################################
 #             check collisions and movements functions              #
