@@ -856,7 +856,7 @@ platform_checked:
 	beq $t8, 0x61, left   	# ASCII code of 'a' is 0x61
 	beq $t8, 0x73, down  	# ASCII code of 's' is 0x73 
 	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
-
+# check movement type
 check_mtp:
 	li $a0, 64 	  		#t7 = 64
 	mul $a0, $a0, $s2 		#t7 = 32*y
@@ -866,10 +866,10 @@ check_mtp:
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
 	j dp_offset
+# offset for each movement type
 wp_offset:
 	addi $a0, $a0, -244  	#t7 + 8 row below + 5 cell righ
 	j sp_check
-
 ap_offset:
 	addi $a0, $a0, 1988  	#t7 + 8 row below + 5 cell left
 	j vertical_p_check
@@ -879,9 +879,8 @@ dp_offset:
 sp_offset:
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
 	j sp_check
-	
+# vertical (y -axis) platform collision check
 vertical_p_check:
-#$a0 player location + offset
 	addi $a1, $a1, BASE_ADDRESS
 	li $t5, 0
 loop_vpc:
@@ -892,10 +891,9 @@ loop_vpc:
     	j loop_vpc
 end_loop_vpc:
 	jr $ra
-
+# horizontal (x -axis) platform collision check
 sp_check:
-#$a0 player location + offset
-	addi $a1, $a1,-4 #shift left once
+	addi $a1, $a1,-4 	#shift left once
 	addi $a1, $a1, BASE_ADDRESS
 	bge $a0, $a1, csp
 	j sp_check_next
@@ -958,6 +956,7 @@ check_mt:
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
 	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
 	j platform_check
+# set offset for different movement type
 a_offset:
 	addi $a0, $a0, 2028  	#t7 + 8 row below + 5 cell left
 	j vertical_check
@@ -967,9 +966,8 @@ d_offset:
 s_offset:
 	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
 	j s_check
-	
+# vertical (y -axis) platform collision check	
 vertical_check:
-#$a0 player location + offset
 	addi $a1, $a1, BASE_ADDRESS
 	li $t5, 0
 loop_vc:
@@ -981,9 +979,8 @@ loop_vc:
     	j loop_vc
 end_loop_vc:
 	jr $ra
-	
+# horizontal (x -axis) platform collision check	
 s_check:
-#$a0 player location + offset
 	addi $a1, $a1,-4 #shift left once
 	add $a1, $a1, BASE_ADDRESS
 	bge $a0, $a1, cs
