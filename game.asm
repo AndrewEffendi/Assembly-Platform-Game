@@ -283,10 +283,10 @@ paint_ground:
     	li $t0, 0
 loop_ground:
 	bge $t0, 256, add_spike
-	li $t5, 4	  # 4 bytes
-	mul $t5, $t5, $t0 # offset = 4 bytes * index
-	add $t5, $t5, $a0 # t5 = address + offset
-	sw $a1, ($t5)
+	li $t1, 4	  # 4 bytes
+	mul $t1, $t1, $t0 # offset = 4 bytes * index
+	add $t1, $t1, $a0 # t1 = address + offset
+	sw $a1, ($t1)
     	addi $t0, $t0, 1
     	j loop_ground
 # ------------------------------------
@@ -385,10 +385,10 @@ paint_platform:
     	li $t0, 0 # init t0 = 0
 loop_platform:
 	bge $t0, 15, end_loop_p
-	li $t5, 4 	  # 4 bytes
-	mul $t5, $t5, $t0 # offset = 4 bytes * index
-	add $t5, $t5, $a0 # t5 = address + offset
-	sw $a1, ($t5)
+	li $t1, 4 	  # 4 bytes
+	mul $t1, $t1, $t0 # offset = 4 bytes * index
+	add $t1, $t1, $a0 # t1 = address + offset
+	sw $a1, ($t1)
     	addi $t0, $t0, 1
     	j loop_platform
 end_loop_p:
@@ -728,10 +728,10 @@ jump_check_ground:
     	li $t0, 0
 loop_jcg:
 	bge $t0, 64, end_loop_jcg
-	li $t5, 4	  	# 4 bytes
-	mul $t5, $t5, $t0 	# offset = 4 bytes * index
-	add $t5, $t5, $t6 	# t5 = address + offset
-	beq $t5, $a0 double_jump_reset
+	li $t1, 4	  	# 4 bytes
+	mul $t1, $t1, $t0 	# offset = 4 bytes * index
+	add $t1, $t1, $t6 	# t1 = address + offset
+	beq $t1, $a0 double_jump_reset
     	addi $t0, $t0, 1
     	j loop_jcg
 end_loop_jcg:
@@ -767,10 +767,10 @@ jump_check_patform:
 	li $t0, -2 		# init t0 = 0
 loop_jcp:
 	bge $t0, 15, end_loop_jcp
-	li $t5, 4	  	# 4 bytes
-	mul $t5, $t5, $t0 	# offset = 4 bytes * index
-	add $t5, $t5, $a1 	# t5 = address + offset
-	beq $t5, $a0 double_jump_reset
+	li $t1, 4	  	# 4 bytes
+	mul $t1, $t1, $t0 	# offset = 4 bytes * index
+	add $t1, $t1, $a1 	# t1 = address + offset
+	beq $t1, $a0 double_jump_reset
     	addi $t0, $t0, 1
     	j loop_jcp
 end_loop_jcp:
@@ -882,12 +882,12 @@ sp_offset:
 # vertical (y -axis) platform collision check
 vertical_p_check:
 	addi $a1, $a1, BASE_ADDRESS
-	li $t5, 0
+	li $t1, 0
 loop_vpc:
-	bge $t5, 9, end_loop_vpc
+	bge $t1, 9, end_loop_vpc
 	beq $a1, $a0, wait
 	addi $a1, $a1, 256
-    	addi $t5, $t5, 1
+    	addi $t1, $t1, 1
     	j loop_vpc
 end_loop_vpc:
 	jr $ra
@@ -969,13 +969,13 @@ s_offset:
 # vertical (y -axis) platform collision check	
 vertical_check:
 	addi $a1, $a1, BASE_ADDRESS
-	li $t5, 0
+	li $t1, 0
 loop_vc:
-	bge $t5, 5, end_loop_vc
+	bge $t1, 5, end_loop_vc
 	# here damage
 	beq $a1, $a0, remove_health
 	addi $a1, $a1, 256
-    	addi $t5, $t5, 1
+    	addi $t1, $t1, 1
     	j loop_vc
 end_loop_vc:
 	jr $ra
