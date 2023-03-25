@@ -546,118 +546,118 @@ paint_health:
 # ------------------------------------
 # paint player	
 paint_player:
-	li $t0, 64 	  	# a0 = 64
-	mul $t0, $t0, $s2 	# a0 = 64*y
-	add $t0, $s1, $t0 	# a0 = x + 64*y
+	li $t0, 64 	  	# t0 = 64
+	mul $t0, $t0, $s2 	# t0 = 64*y
+	add $t0, $s1, $t0 	# t0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
-	li $a1, COLOR_RED
-	sw $a1, 4($t0)
-	sw $a1, 8($t0)
-	sw $a1, 12($t0)
-	sw $a1, 260($t0)
-	sw $a1, 264($t0)
-	sw $a1, 268($t0)
-	sw $a1, 272($t0)
-	sw $a1, 1028($t0)
-	sw $a1, 1036($t0)
-	li $a1, COLOR_CREAM
-	sw $a1, 516($t0)
-	sw $a1, 520($t0)
-	sw $a1, 524($t0)
-	sw $a1, 772($t0)
-	sw $a1, 776($t0)
-	sw $a1, 780($t0)
-	sw $a1, 1024($t0)
-	sw $a1, 1040($t0)
-	sw $a1, 2052($t0)
-	sw $a1, 2060($t0)
-	li $a1, COLOR_BLUE
-	sw $a1, 1032($t0)
-	sw $a1, 1284($t0)
-	sw $a1, 1288($t0)
-	sw $a1, 1292($t0)
-	sw $a1, 1540($t0)
-	sw $a1, 1544($t0)
-	sw $a1, 1548($t0)
-	sw $a1, 1796($t0)
-	sw $a1, 1800($t0)
-	sw $a1, 1804($t0)
+	li $t1, COLOR_RED
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)
+	sw $t1, 260($t0)
+	sw $t1, 264($t0)
+	sw $t1, 268($t0)
+	sw $t1, 272($t0)
+	sw $t1, 1028($t0)
+	sw $t1, 1036($t0)
+	li $t1, COLOR_CREAM
+	sw $t1, 516($t0)
+	sw $t1, 520($t0)
+	sw $t1, 524($t0)
+	sw $t1, 772($t0)
+	sw $t1, 776($t0)
+	sw $t1, 780($t0)
+	sw $t1, 1024($t0)
+	sw $t1, 1040($t0)
+	sw $t1, 2052($t0)
+	sw $t1, 2060($t0)
+	li $t1, COLOR_BLUE
+	sw $t1, 1032($t0)
+	sw $t1, 1284($t0)
+	sw $t1, 1288($t0)
+	sw $t1, 1292($t0)
+	sw $t1, 1540($t0)
+	sw $t1, 1544($t0)
+	sw $t1, 1548($t0)
+	sw $t1, 1796($t0)
+	sw $t1, 1800($t0)
+	sw $t1, 1804($t0)
 	jr $ra
 # ------------------------------------
 # remove player	
 remove_player:
-	li $t0, 64 	  	# a0 = 64
-	mul $t0, $t0, $s2 	# a0 = 64*y
-	add $t0, $s1, $t0 	# a0 = x + 64*y
+	li $t0, 64 	  	# t0 = 64
+	mul $t0, $t0, $s2 	# t0 = 64*y
+	add $t0, $s1, $t0 	# t0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
-	li $a1, COLOR_BLACK
-	sw $a1, 4($t0)
-	sw $a1, 8($t0)
-	sw $a1, 12($t0)
-	sw $a1, 260($t0)
-	sw $a1, 264($t0)
-	sw $a1, 268($t0)
-	sw $a1, 272($t0)
-	sw $a1, 516($t0)
-	sw $a1, 520($t0)
-	sw $a1, 524($t0)
-	sw $a1, 772($t0)
-	sw $a1, 776($t0)
-	sw $a1, 780($t0)
-	sw $a1, 1024($t0)
-	sw $a1, 1040($t0)
-	sw $a1, 2052($t0)
-	sw $a1, 2060($t0)
-	sw $a1, 1028($t0)
-	sw $a1, 1032($t0)
-	sw $a1, 1036($t0)
-	sw $a1, 1284($t0)
-	sw $a1, 1288($t0)
-	sw $a1, 1292($t0)
-	sw $a1, 1540($t0)
-	sw $a1, 1544($t0)
-	sw $a1, 1548($t0)
-	sw $a1, 1796($t0)
-	sw $a1, 1800($t0)
-	sw $a1, 1804($t0)
+	li $t1, COLOR_BLACK
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)
+	sw $t1, 260($t0)
+	sw $t1, 264($t0)
+	sw $t1, 268($t0)
+	sw $t1, 272($t0)
+	sw $t1, 516($t0)
+	sw $t1, 520($t0)
+	sw $t1, 524($t0)
+	sw $t1, 772($t0)
+	sw $t1, 776($t0)
+	sw $t1, 780($t0)
+	sw $t1, 1024($t0)
+	sw $t1, 1040($t0)
+	sw $t1, 2052($t0)
+	sw $t1, 2060($t0)
+	sw $t1, 1028($t0)
+	sw $t1, 1032($t0)
+	sw $t1, 1036($t0)
+	sw $t1, 1284($t0)
+	sw $t1, 1288($t0)
+	sw $t1, 1292($t0)
+	sw $t1, 1540($t0)
+	sw $t1, 1544($t0)
+	sw $t1, 1548($t0)
+	sw $t1, 1796($t0)
+	sw $t1, 1800($t0)
+	sw $t1, 1804($t0)
 	jr $ra
 # ------------------------------------
 # damage player	
 damage_player:
-	li $t0, 64 	  	# a0 = 64
-	mul $t0, $t0, $s2 	# a0 = 64*y
-	add $t0, $s1, $t0 	# a0 = x + 64*y
+	li $t0, 64 	  	# t0 = 64
+	mul $t0, $t0, $s2 	# t0 = 64*y
+	add $t0, $s1, $t0 	# t0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
-	li $a1, COLOR_RED
-	sw $a1, 4($t0)
-	sw $a1, 8($t0)
-	sw $a1, 12($t0)
-	sw $a1, 260($t0)
-	sw $a1, 264($t0)
-	sw $a1, 268($t0)
-	sw $a1, 272($t0)
-	sw $a1, 1028($t0)
-	sw $a1, 1036($t0)
-	sw $a1, 516($t0)
-	sw $a1, 520($t0)
-	sw $a1, 524($t0)
-	sw $a1, 772($t0)
-	sw $a1, 776($t0)
-	sw $a1, 780($t0)
-	sw $a1, 1024($t0)
-	sw $a1, 1040($t0)
-	sw $a1, 2052($t0)
-	sw $a1, 2060($t0)
-	sw $a1, 1032($t0)
-	sw $a1, 1284($t0)
-	sw $a1, 1288($t0)
-	sw $a1, 1292($t0)
-	sw $a1, 1540($t0)
-	sw $a1, 1544($t0)
-	sw $a1, 1548($t0)
-	sw $a1, 1796($t0)
-	sw $a1, 1800($t0)
-	sw $a1, 1804($t0)
+	li $t1, COLOR_RED
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)
+	sw $t1, 260($t0)
+	sw $t1, 264($t0)
+	sw $t1, 268($t0)
+	sw $t1, 272($t0)
+	sw $t1, 1028($t0)
+	sw $t1, 1036($t0)
+	sw $t1, 516($t0)
+	sw $t1, 520($t0)
+	sw $t1, 524($t0)
+	sw $t1, 772($t0)
+	sw $t1, 776($t0)
+	sw $t1, 780($t0)
+	sw $t1, 1024($t0)
+	sw $t1, 1040($t0)
+	sw $t1, 2052($t0)
+	sw $t1, 2060($t0)
+	sw $t1, 1032($t0)
+	sw $t1, 1284($t0)
+	sw $t1, 1288($t0)
+	sw $t1, 1292($t0)
+	sw $t1, 1540($t0)
+	sw $t1, 1544($t0)
+	sw $t1, 1548($t0)
+	sw $t1, 1796($t0)
+	sw $t1, 1800($t0)
+	sw $t1, 1804($t0)
 	li $v0, 32 
 	li $a0, 100   		# Wait 100 milliseconds 
 	syscall 
