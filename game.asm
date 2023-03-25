@@ -87,8 +87,8 @@
   # s5: enemy direction
   # s6: clock counter
   # s7: level
-  # t0: jump counter
-  # t8: previouse pressed key
+  # t8: previous pressed key
+  # t9: jump counter
 
 # ------------------------------------
 # initialize program global variable	
@@ -103,14 +103,14 @@ next_level:
  	li $s4, 0 	# 0 to 40 range
  	li $s5, 0 	# 0 right, 1 left
  	li $s6, 1 	# reset clock to 1
- 	li $t0, 0 	# jump counter
+ 	li $t9, 0 	# jump counter
  	j paint_ground
 # ------------------------------------
 # main loop
 wait:
- 	# Wait 1for key press
- 	li $t9, 0xffff0000  
-	lw $t8, 0($t9) 
+ 	# Wait for key press
+ 	li $t7, 0xffff0000  
+	lw $t8, 0($t7) 
 	beq $t8, 1, keypress_happened 
 	
 	# every 0.5 got to half_second to update gravity and move monster
@@ -125,7 +125,7 @@ wait:
 # ------------------------------------
 # handle keypresses
 keypress_happened :	
-	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
+	lw $t8, 4($t7) # this assumes $t7 is set to 0xfff0000 from before 
 	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
@@ -134,23 +134,23 @@ keypress_happened :
 	beq $t8, 0x31, respond_to_1   # ASCII code of '1' is 0x31
 	beq $t8, 0x32, respond_to_2   # ASCII code of '2' is 0x32
 	beq $t8, 0x33, respond_to_3   # ASCII code of '3' is 0x32
-	beq $t8, 0x6b, respond_to_k   # ASCII code of 'k' is 0x6b to be remove
-	beq $t8, 0x6c, respond_to_l   # ASCII code of 'l' is 0x6c to be remove
+	beq $t8, 0x6b, win_screen   # ASCII code of 'k' is 0x6b to be remove
+	beq $t8, 0x6c, lose_screen   # ASCII code of 'l' is 0x6c to be remove
 	j wait
 # ------------------------------------
 # w keypress
 respond_to_w:
 	beq $s3, 0, wait # jump not available
 	addi $s3, $s3, -1 #reduce jump
-jump_1:	li $t0, 1
+jump_1:	li $t9, 1
 	j jump_loop
-jump_2: li $t0, 2
+jump_2: li $t9, 2
 	j jump_loop
-jump_3: li $t0, 3
+jump_3: li $t9, 3
 	j jump_loop
-jump_4: li $t0, 4
+jump_4: li $t9, 4
 	j jump_loop
-jump_5: li $t0, 0
+jump_5: li $t9, 0
 	j jump_loop
 jump_loop:
 	ble $s2, 40, wait
@@ -183,10 +183,10 @@ right: 	addi $s1, $s1, 4 	# x+4
 move_player:
 	jal paint_player
 jump_count:
-	beq $t0, 1, jump_2
-	beq $t0, 2, jump_3
-	beq $t0, 3, jump_4
-	beq $t0, 4, jump_5
+	beq $t9, 1, jump_2
+	beq $t9, 2, jump_3
+	beq $t9, 3, jump_4
+	beq $t9, 4, jump_5
 	j finish_check
 finished_check:
 	bne $t8 0x77, jump_check # w
@@ -514,7 +514,7 @@ remove_health:
 	beq $s0, 3, rh_3
 	beq $s0, 2, rh_2
 	beq $s0, 1, rh_1
-	j respond_to_l
+	j lose_screen
 rh_3:	li, $a0, HEALTH_3
 	jal paint_health
 	j damage_player
@@ -523,7 +523,7 @@ rh_2:	li, $a0, HEALTH_2
 	j damage_player
 rh_1:	li, $a0, HEALTH_1
 	jal paint_health
-	j respond_to_l
+	j lose_screen
 # paint health	
 paint_health:
 	# $a0: position
@@ -812,13 +812,13 @@ finish_check_2:
 	j finished_check
 finish_check_3:
 	li $t6, FINISH_3
-	beq $a0, $t6, respond_to_k
+	beq $a0, $t6, win_screen
 	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_k
+	beq $a0, $t6, win_screen
 	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_k
+	beq $a0, $t6, win_screen
 	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_k
+	beq $a0, $t6, win_screen
 	j finished_check
 # ------------------------------------
 # check platform collision
@@ -998,13 +998,14 @@ end_hc:
 # ------------------------------------
 # end screen wait for player to press p to restart
 end_screen:
-	li $t9, 0xffff0000  
-	lw $t8, 4($t9) # this assumes $t9 is set to 0xfff0000 from before 
+	li $t7, 0xffff0000  
+	lw $t8, 4($t7) # this assumes $t7 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
+	beq $t8, 0x78, Exit   # ASCII code of 'p' is 0x78
 	j end_screen
 # ------------------------------------
 # win end screen 
-respond_to_k:
+win_screen:
 	li $t8, 0x6b
 	li $a3, 4
 	j remove_spike
@@ -1013,7 +1014,7 @@ end_r_p_4:
 	jal remove_player
 	j win	
 # lose end screen 
-respond_to_l:
+lose_screen:
 	li $t8, 0x6c
 	li $a3, 5
 	j remove_spike
