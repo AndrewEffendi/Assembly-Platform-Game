@@ -125,23 +125,23 @@ wait:
 # ------------------------------------
 # handle keypresses
 keypress_happened :	
-	lw $t8, 4($t0) # this assumes $t0 is set to 0xfff0000 from before 
-	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
-	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
-	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
-	beq $t8, 0x64, respond_to_d   # ASCII code of 'd' is 0x64
-	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
-	beq $t8, 0x31, respond_to_1   # ASCII code of '1' is 0x31
-	beq $t8, 0x32, respond_to_2   # ASCII code of '2' is 0x32
-	beq $t8, 0x33, respond_to_3   # ASCII code of '3' is 0x32
-	beq $t8, 0x6b, win_screen   # ASCII code of 'k' is 0x6b to be remove
-	beq $t8, 0x6c, lose_screen   # ASCII code of 'l' is 0x6c to be remove
+	lw $t8, 4($t0) 			# this assumes $t0 is set to 0xfff0000 from before 
+	beq $t8, 0x77, respond_to_w   	# ASCII code of 'w' is 0x77 
+	beq $t8, 0x61, respond_to_a   	# ASCII code of 'a' is 0x61
+	beq $t8, 0x73, respond_to_s   	# ASCII code of 's' is 0x73 
+	beq $t8, 0x64, respond_to_d   	# ASCII code of 'd' is 0x64
+	beq $t8, 0x70, respond_to_p   	# ASCII code of 'p' is 0x70
+	beq $t8, 0x31, respond_to_1   	# ASCII code of '1' is 0x31
+	beq $t8, 0x32, respond_to_2   	# ASCII code of '2' is 0x32
+	beq $t8, 0x33, respond_to_3   	# ASCII code of '3' is 0x32
+	beq $t8, 0x6b, win_screen   	# ASCII code of 'k' is 0x6b to be remove
+	beq $t8, 0x6c, lose_screen   	# ASCII code of 'l' is 0x6c to be remove
 	j wait
 # ------------------------------------
 # w keypress
 respond_to_w:
-	beq $s3, 0, wait # jump not available
-	addi $s3, $s3, -1 #reduce jump
+	beq $s3, 0, wait 	# jump not available
+	addi $s3, $s3, -1 	# reduce jump
 jump_1:	li $t9, 1
 	j jump_loop
 jump_2: li $t9, 2
@@ -254,15 +254,15 @@ remove_monster_done:
 	beqz $s5, move_monster_right
 	j move_monster_left 
 move_monster_left:
-	addi $s4, $s4, -4 #move monster left
+	addi $s4, $s4, -4 # move monster left
 	j add_monster
 move_monster_right:
-	addi $s4, $s4, 4 #move monster right
+	addi $s4, $s4, 4  # move monster right
 	j add_monster
 move_monster_done:
-	li $s6, 1 # reset clock to 1
+	li $s6, 1 	# reset clock to 1
 	li $t8, 0x73
-	j respond_to_s #go down once
+	j respond_to_s 	#go down once
 # ------------------------------------
 # Exit
 Exit:
@@ -546,9 +546,9 @@ paint_health:
 # ------------------------------------
 # paint player	
 paint_player:
-	li $t0, 64 	  	#t0 = 64
-	mul $t0, $t0, $s2 	#t0 = 256/64*y = 64*y
-	add $t0, $s1, $t0 	#t0 = x + 64*y
+	li $t0, 64 	  	# a0 = 64
+	mul $t0, $t0, $s2 	# a0 = 64*y
+	add $t0, $s1, $t0 	# a0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_RED
 	sw $a1, 4($t0)
@@ -586,9 +586,9 @@ paint_player:
 # ------------------------------------
 # remove player	
 remove_player:
-	li $t0, 64 	  	#t0 = 64
-	mul $t0, $t0, $s2 	#t0 = 32*y
-	add $t0, $s1, $t0 	#t0 = x + 32*y
+	li $t0, 64 	  	# a0 = 64
+	mul $t0, $t0, $s2 	# a0 = 64*y
+	add $t0, $s1, $t0 	# a0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_BLACK
 	sw $a1, 4($t0)
@@ -624,9 +624,9 @@ remove_player:
 # ------------------------------------
 # damage player	
 damage_player:
-	li $t0, 64 	  	#t0 = 64
-	mul $t0, $t0, $s2 	#t0 = 256/64*y = 64*y
-	add $t0, $s1, $t0 	#t0 = x + 64*y
+	li $t0, 64 	  	# a0 = 64
+	mul $t0, $t0, $s2 	# a0 = 64*y
+	add $t0, $s1, $t0 	# a0 = x + 64*y
 	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_RED
 	sw $a1, 4($t0)
@@ -673,16 +673,16 @@ damage_player:
 # check monster movement
 check_move_monster:
 	# player location
-	li $a0, 64 	  	#t0 = 64
-	mul $a0, $a0, $s2 	#t0 = 32*y
-	add $a0, $s1, $a0 	#t0 = x + 32*y
+	li $a0, 64 	  	# a0 = 64
+	mul $a0, $a0, $s2 	# a0 = 64*y
+	add $a0, $s1, $a0 	# a0 = x + 64*y
 	beqz $s5, check_move_monster_right
 	j check_move_monster_left
 check_move_monster_left:
-	addi $a0, $a0, 1044 	# 4 row down + 5 cell right
+	addi $a0, $a0, 1044 	# 4*256 (down) down + 5 *4 (right)
 	j cmm_start
 check_move_monster_right:
-	addi $a0, $a0, 1004 	# 4 row down + 5 cell left
+	addi $a0, $a0, 1004 	# 4*256 (down) down + -5*4 (left)
 	j cmm_start
 cmm_start:
 	beq $s7, 2, monster_move_check_2
@@ -718,10 +718,10 @@ check_mm:
 # check double jump	
 jump_check:
 	# player location
-	li $a0, 64 	  	#t0 = 64
-	mul $a0, $a0, $s2 	#t0 = 32*y
-	add $a0, $s1, $a0 	#t0 = x + 32*y
-	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
+	li $a0, 64 	  	# a0 = 64
+	mul $a0, $a0, $s2 	# a0 = 64*y
+	add $a0, $s1, $a0 	# a0 = x + 64*y
+	addi $a0, $a0, 2308 	# 9*256 (down) + 1*4 (right)
 # check double jump ground
 jump_check_ground:
 	li $t2, GROUND
@@ -782,10 +782,10 @@ double_jump_reset:
 # check player at finish line
 finish_check:
 	# player location
-	li $a0, 64 	  	#t0 = 64
-	mul $a0, $a0, $s2 	#t0 = 32*y
-	add $a0, $s1, $a0 	#t0 = x + 32*y
-	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
+	li $a0, 64 	  	# a0 = 64
+	mul $a0, $a0, $s2 	# a0 = 64*y
+	add $a0, $s1, $a0 	# a0 = x + 64*y
+	addi $a0, $a0, 2308 	# 9*256 (down) + 1*4 (right)
 	beq $s7, 1, finish_check_1
 	beq $s7, 2, finish_check_2
 	j finish_check_3
@@ -858,26 +858,26 @@ platform_checked:
 	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
 # check movement type
 check_mtp:
-	li $a0, 64 	  		#t0 = 64
-	mul $a0, $a0, $s2 		#t0 = 32*y
-	add $a0, $s1, $a0 		#t0 = x + 32*y
-	addi $a0, $a0, BASE_ADDRESS 	# t0 = base + offset
+	li $a0, 64 	  		# a0 = 64
+	mul $a0, $a0, $s2 		# a0 = 64*y
+	add $a0, $s1, $a0 		# a0 = x + 64*y
+	addi $a0, $a0, BASE_ADDRESS 	# a0 = base + offset
 	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
 	j dp_offset
 # offset for each movement type
 wp_offset:
-	addi $a0, $a0, -244  	#t0 + 8 row below + 5 cell righ
+	addi $a0, $a0, -244  	# 1*256 (up) + 1*3 (right)
 	j horizontal_p_check
 ap_offset:
-	addi $a0, $a0, 1988  	#t0 + 8 row below + 5 cell left
+	addi $a0, $a0, 1988  	# 8*256 (down) + -15*4 (left)
 	j vertical_p_check
 dp_offset:
-	addi $a0, $a0, 2068  	#t0 + 8 row below + 5 cell right
+	addi $a0, $a0, 2068  	# 8*256 (down) + 5*4 (right)
 	j vertical_p_check
 sp_offset:
-	addi $a0, $a0, 2316  	#t0 + 8 row below + 5 cell righ
+	addi $a0, $a0, 2316  	# 9*256 (down) + 3*4 (right)
 	j horizontal_p_check
 # vertical (y -axis) platform collision check
 vertical_p_check:
@@ -893,7 +893,7 @@ end_loop_vpc:
 	jr $ra
 # horizontal (x -axis) platform collision check
 horizontal_p_check:
-	addi $a1, $a1,-4 	#shift left once
+	addi $a1, $a1,-4 	# shift left once
 	addi $a1, $a1, BASE_ADDRESS
 	bge $a0, $a1, hcp_and
 	j end_hcp
@@ -948,23 +948,23 @@ collision_check_3:
 	j platform_check
 #check movement type
 check_mt:
-	li $a0, 64 	  	#t0 = 64
-	mul $a0, $a0, $s2 	#t0 = 64*y
-	add $a0, $s1, $a0 	#t0 = x + 32*y
-	addi $a0, $a0, BASE_ADDRESS 	# t0 = base + offset
+	li $a0, 64 	  		# a0 = 64
+	mul $a0, $a0, $s2 		# a0 = 64*y
+	add $a0, $s1, $a0 		# a0 = x + 64*y
+	addi $a0, $a0, BASE_ADDRESS 	# a0 = base + offset
 	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
 	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
 	j platform_check
 # set offset for different movement type
 a_offset:
-	addi $a0, $a0, 2028  	#t0 + 8 row below + 5 cell left
+	addi $a0, $a0, 2028  	# 8*256 (down) + -5*4 (left)
 	j vertical_check
 d_offset:
-	addi $a0, $a0, 2068  	#t0 + 8 row below + 5 cell right
+	addi $a0, $a0, 2068  	# 8*256 (down) + 5*4 (right)
 	j vertical_check
 s_offset:
-	addi $a0, $a0, 2316  	#t0 + 8 row below + 5 cell righ
+	addi $a0, $a0, 2316  	# 9*256 (down) + 3*4 (right)
 	j horizontal_check
 # vertical (y -axis) platform collision check	
 vertical_check:
@@ -999,9 +999,9 @@ end_hc:
 # end screen wait for player to press p to restart
 end_screen:
 	li $t0, 0xffff0000  
-	lw $t8, 4($t0) # this assumes $t0 is set to 0xfff0000 from before 
-	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
-	beq $t8, 0x78, Exit   # ASCII code of 'p' is 0x78
+	lw $t8, 4($t0) 			# this assumes $t0 is set to 0xfff0000 from before 
+	beq $t8, 0x70, respond_to_p   	# ASCII code of 'p' is 0x70
+	beq $t8, 0x78, Exit   		# ASCII code of 'p' is 0x78
 	j end_screen
 # ------------------------------------
 # win end screen 
