@@ -724,13 +724,13 @@ jump_check:
 	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
 # check double jump ground
 jump_check_ground:
-	li $t6, GROUND
+	li $t2, GROUND
     	li $t0, 0
 loop_jcg:
 	bge $t0, 64, end_loop_jcg
 	li $t1, 4	  	# 4 bytes
 	mul $t1, $t1, $t0 	# offset = 4 bytes * index
-	add $t1, $t1, $t6 	# t1 = address + offset
+	add $t1, $t1, $t2 	# t1 = address + offset
 	beq $t1, $a0 double_jump_reset
     	addi $t0, $t0, 1
     	j loop_jcg
@@ -791,34 +791,34 @@ finish_check:
 	j finish_check_3
 	j finished_check
 finish_check_1:
-	li $t6, FINISH_1
-	beq $a0, $t6, respond_to_2
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_2
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_2
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_2
+	li $t2, FINISH_1
+	beq $a0, $t2, respond_to_2
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_2
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_2
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_2
 	j finished_check
 finish_check_2:
-	li $t6, FINISH_2
-	beq $a0, $t6, respond_to_3
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_3
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_3
-	addi $t6, $t6, 4
-	beq $a0, $t6, respond_to_3
+	li $t2, FINISH_2
+	beq $a0, $t2, respond_to_3
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_3
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_3
+	addi $t2, $t2, 4
+	beq $a0, $t2, respond_to_3
 	j finished_check
 finish_check_3:
-	li $t6, FINISH_3
-	beq $a0, $t6, win_screen
-	addi $t6, $t6, 4
-	beq $a0, $t6, win_screen
-	addi $t6, $t6, 4
-	beq $a0, $t6, win_screen
-	addi $t6, $t6, 4
-	beq $a0, $t6, win_screen
+	li $t2, FINISH_3
+	beq $a0, $t2, win_screen
+	addi $t2, $t2, 4
+	beq $a0, $t2, win_screen
+	addi $t2, $t2, 4
+	beq $a0, $t2, win_screen
+	addi $t2, $t2, 4
+	beq $a0, $t2, win_screen
 	j finished_check
 # ------------------------------------
 # check platform collision
