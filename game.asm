@@ -1134,6 +1134,8 @@ pptr_start:
 	j end_screen
 # ------------------------------------
 # paint big letters
+# $a0: position
+# $a1: colour
 paint_big_E:
  	sw $a1,($a0)
 	sw $a1, 4($a0)
@@ -1471,6 +1473,8 @@ paint_big_W:
 	jr $ra
 # ------------------------------------
 # paint small letters
+# $a0: position
+# $a1: colour
 paint_A:
 	sw $a1,($a0)
 	sw $a1, 4($a0)
