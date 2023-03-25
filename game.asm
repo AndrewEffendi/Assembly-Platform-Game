@@ -109,8 +109,8 @@ next_level:
 # main loop
 wait:
  	# Wait for key press
- 	li $t7, 0xffff0000  
-	lw $t8, 0($t7) 
+ 	li $t0, 0xffff0000  
+	lw $t8, 0($t0) 
 	beq $t8, 1, keypress_happened 
 	
 	# every 0.5 got to half_second to update gravity and move monster
@@ -125,7 +125,7 @@ wait:
 # ------------------------------------
 # handle keypresses
 keypress_happened :	
-	lw $t8, 4($t7) # this assumes $t7 is set to 0xfff0000 from before 
+	lw $t8, 4($t0) # this assumes $t0 is set to 0xfff0000 from before 
 	beq $t8, 0x77, respond_to_w   # ASCII code of 'w' is 0x77 
 	beq $t8, 0x61, respond_to_a   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, respond_to_s   # ASCII code of 's' is 0x73 
@@ -280,14 +280,14 @@ paint_ground:
 	li $a1, COLOR_GROUND
 	li $a0, GROUND
 	addi $a0, $a0, BASE_ADDRESS
-    	li $t7, 0
+    	li $t0, 0
 loop_ground:
-	bge $t7, 256, add_spike
+	bge $t0, 256, add_spike
 	li $t5, 4	  # 4 bytes
-	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	mul $t5, $t5, $t0 # offset = 4 bytes * index
 	add $t5, $t5, $a0 # t5 = address + offset
 	sw $a1, ($t5)
-    	addi $t7, $t7, 1
+    	addi $t0, $t0, 1
     	j loop_ground
 # ------------------------------------
 # add or remove spike
@@ -382,14 +382,14 @@ paint_platform:
 	# $a1: colour
 	# $a3 remove calling level
 	addi $a0, $a0, BASE_ADDRESS
-    	li $t7, 0 # init t7 = 0
+    	li $t0, 0 # init t0 = 0
 loop_platform:
-	bge $t7, 15, end_loop_p
+	bge $t0, 15, end_loop_p
 	li $t5, 4 	  # 4 bytes
-	mul $t5, $t5, $t7 # offset = 4 bytes * index
+	mul $t5, $t5, $t0 # offset = 4 bytes * index
 	add $t5, $t5, $a0 # t5 = address + offset
 	sw $a1, ($t5)
-    	addi $t7, $t7, 1
+    	addi $t0, $t0, 1
     	j loop_platform
 end_loop_p:
 	jr $ra
@@ -464,8 +464,8 @@ paint_monster_done:
 	beqz $s6, move_monster_next 	# move monster
 	j add_finish_line
 move_monster_next:	
-	li $t7, COLOR_BLACK	
-	beq $a1, $t7 , remove_monster_done	
+	li $t0, COLOR_BLACK	
+	beq $a1, $t0 , remove_monster_done	
 	j move_monster_done
 # ------------------------------------
 # add finish line
@@ -546,118 +546,118 @@ paint_health:
 # ------------------------------------
 # paint player	
 paint_player:
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 64*y
-	addi $t7, $t7, BASE_ADDRESS
+	li $t0, 64 	  	#t0 = 64
+	mul $t0, $t0, $s2 	#t0 = 256/64*y = 64*y
+	add $t0, $s1, $t0 	#t0 = x + 64*y
+	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_RED
-	sw $a1, 4($t7)
-	sw $a1, 8($t7)
-	sw $a1, 12($t7)
-	sw $a1, 260($t7)
-	sw $a1, 264($t7)
-	sw $a1, 268($t7)
-	sw $a1, 272($t7)
-	sw $a1, 1028($t7)
-	sw $a1, 1036($t7)
+	sw $a1, 4($t0)
+	sw $a1, 8($t0)
+	sw $a1, 12($t0)
+	sw $a1, 260($t0)
+	sw $a1, 264($t0)
+	sw $a1, 268($t0)
+	sw $a1, 272($t0)
+	sw $a1, 1028($t0)
+	sw $a1, 1036($t0)
 	li $a1, COLOR_CREAM
-	sw $a1, 516($t7)
-	sw $a1, 520($t7)
-	sw $a1, 524($t7)
-	sw $a1, 772($t7)
-	sw $a1, 776($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1024($t7)
-	sw $a1, 1040($t7)
-	sw $a1, 2052($t7)
-	sw $a1, 2060($t7)
+	sw $a1, 516($t0)
+	sw $a1, 520($t0)
+	sw $a1, 524($t0)
+	sw $a1, 772($t0)
+	sw $a1, 776($t0)
+	sw $a1, 780($t0)
+	sw $a1, 1024($t0)
+	sw $a1, 1040($t0)
+	sw $a1, 2052($t0)
+	sw $a1, 2060($t0)
 	li $a1, COLOR_BLUE
-	sw $a1, 1032($t7)
-	sw $a1, 1284($t7)
-	sw $a1, 1288($t7)
-	sw $a1, 1292($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
-	sw $a1, 1548($t7)
-	sw $a1, 1796($t7)
-	sw $a1, 1800($t7)
-	sw $a1, 1804($t7)
+	sw $a1, 1032($t0)
+	sw $a1, 1284($t0)
+	sw $a1, 1288($t0)
+	sw $a1, 1292($t0)
+	sw $a1, 1540($t0)
+	sw $a1, 1544($t0)
+	sw $a1, 1548($t0)
+	sw $a1, 1796($t0)
+	sw $a1, 1800($t0)
+	sw $a1, 1804($t0)
 	jr $ra
 # ------------------------------------
 # remove player	
 remove_player:
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 32*y
-	add $t7, $s1, $t7 	#t7 = x + 32*y
-	addi $t7, $t7, BASE_ADDRESS
+	li $t0, 64 	  	#t0 = 64
+	mul $t0, $t0, $s2 	#t0 = 32*y
+	add $t0, $s1, $t0 	#t0 = x + 32*y
+	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_BLACK
-	sw $a1, 4($t7)
-	sw $a1, 8($t7)
-	sw $a1, 12($t7)
-	sw $a1, 260($t7)
-	sw $a1, 264($t7)
-	sw $a1, 268($t7)
-	sw $a1, 272($t7)
-	sw $a1, 516($t7)
-	sw $a1, 520($t7)
-	sw $a1, 524($t7)
-	sw $a1, 772($t7)
-	sw $a1, 776($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1024($t7)
-	sw $a1, 1040($t7)
-	sw $a1, 2052($t7)
-	sw $a1, 2060($t7)
-	sw $a1, 1028($t7)
-	sw $a1, 1032($t7)
-	sw $a1, 1036($t7)
-	sw $a1, 1284($t7)
-	sw $a1, 1288($t7)
-	sw $a1, 1292($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
-	sw $a1, 1548($t7)
-	sw $a1, 1796($t7)
-	sw $a1, 1800($t7)
-	sw $a1, 1804($t7)
+	sw $a1, 4($t0)
+	sw $a1, 8($t0)
+	sw $a1, 12($t0)
+	sw $a1, 260($t0)
+	sw $a1, 264($t0)
+	sw $a1, 268($t0)
+	sw $a1, 272($t0)
+	sw $a1, 516($t0)
+	sw $a1, 520($t0)
+	sw $a1, 524($t0)
+	sw $a1, 772($t0)
+	sw $a1, 776($t0)
+	sw $a1, 780($t0)
+	sw $a1, 1024($t0)
+	sw $a1, 1040($t0)
+	sw $a1, 2052($t0)
+	sw $a1, 2060($t0)
+	sw $a1, 1028($t0)
+	sw $a1, 1032($t0)
+	sw $a1, 1036($t0)
+	sw $a1, 1284($t0)
+	sw $a1, 1288($t0)
+	sw $a1, 1292($t0)
+	sw $a1, 1540($t0)
+	sw $a1, 1544($t0)
+	sw $a1, 1548($t0)
+	sw $a1, 1796($t0)
+	sw $a1, 1800($t0)
+	sw $a1, 1804($t0)
 	jr $ra
 # ------------------------------------
 # damage player	
 damage_player:
-	li $t7, 64 	  	#t7 = 64
-	mul $t7, $t7, $s2 	#t7 = 256/64*y = 64*y
-	add $t7, $s1, $t7 	#t7 = x + 64*y
-	addi $t7, $t7, BASE_ADDRESS
+	li $t0, 64 	  	#t0 = 64
+	mul $t0, $t0, $s2 	#t0 = 256/64*y = 64*y
+	add $t0, $s1, $t0 	#t0 = x + 64*y
+	addi $t0, $t0, BASE_ADDRESS
 	li $a1, COLOR_RED
-	sw $a1, 4($t7)
-	sw $a1, 8($t7)
-	sw $a1, 12($t7)
-	sw $a1, 260($t7)
-	sw $a1, 264($t7)
-	sw $a1, 268($t7)
-	sw $a1, 272($t7)
-	sw $a1, 1028($t7)
-	sw $a1, 1036($t7)
-	sw $a1, 516($t7)
-	sw $a1, 520($t7)
-	sw $a1, 524($t7)
-	sw $a1, 772($t7)
-	sw $a1, 776($t7)
-	sw $a1, 780($t7)
-	sw $a1, 1024($t7)
-	sw $a1, 1040($t7)
-	sw $a1, 2052($t7)
-	sw $a1, 2060($t7)
-	sw $a1, 1032($t7)
-	sw $a1, 1284($t7)
-	sw $a1, 1288($t7)
-	sw $a1, 1292($t7)
-	sw $a1, 1540($t7)
-	sw $a1, 1544($t7)
-	sw $a1, 1548($t7)
-	sw $a1, 1796($t7)
-	sw $a1, 1800($t7)
-	sw $a1, 1804($t7)
+	sw $a1, 4($t0)
+	sw $a1, 8($t0)
+	sw $a1, 12($t0)
+	sw $a1, 260($t0)
+	sw $a1, 264($t0)
+	sw $a1, 268($t0)
+	sw $a1, 272($t0)
+	sw $a1, 1028($t0)
+	sw $a1, 1036($t0)
+	sw $a1, 516($t0)
+	sw $a1, 520($t0)
+	sw $a1, 524($t0)
+	sw $a1, 772($t0)
+	sw $a1, 776($t0)
+	sw $a1, 780($t0)
+	sw $a1, 1024($t0)
+	sw $a1, 1040($t0)
+	sw $a1, 2052($t0)
+	sw $a1, 2060($t0)
+	sw $a1, 1032($t0)
+	sw $a1, 1284($t0)
+	sw $a1, 1288($t0)
+	sw $a1, 1292($t0)
+	sw $a1, 1540($t0)
+	sw $a1, 1544($t0)
+	sw $a1, 1548($t0)
+	sw $a1, 1796($t0)
+	sw $a1, 1800($t0)
+	sw $a1, 1804($t0)
 	li $v0, 32 
 	li $a0, 100   		# Wait 100 milliseconds 
 	syscall 
@@ -673,9 +673,9 @@ damage_player:
 # check monster movement
 check_move_monster:
 	# player location
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
+	li $a0, 64 	  	#t0 = 64
+	mul $a0, $a0, $s2 	#t0 = 32*y
+	add $a0, $s1, $a0 	#t0 = x + 32*y
 	beqz $s5, check_move_monster_right
 	j check_move_monster_left
 check_move_monster_left:
@@ -703,36 +703,36 @@ monster_move_check_3:
 	jal check_mm
 	j update_monster
 check_mm:
-	add $t7, $a1, $s4
-	beq $a0, $t7, remove_health
-	addi $t7, $t7, -256 #move monster up
-	beq $a0, $t7, remove_health
-	addi $t7, $t7, -256 #move monster up
-	beq $a0, $t7, remove_health
-	addi $t7, $t7, -256 #move monster up
-	beq $a0, $t7, remove_health
-	addi $t7, $t7, -256 #move monster up
-	beq $a0, $t7, remove_health
+	add $t0, $a1, $s4
+	beq $a0, $t0, remove_health
+	addi $t0, $t0, -256 #move monster up
+	beq $a0, $t0, remove_health
+	addi $t0, $t0, -256 #move monster up
+	beq $a0, $t0, remove_health
+	addi $t0, $t0, -256 #move monster up
+	beq $a0, $t0, remove_health
+	addi $t0, $t0, -256 #move monster up
+	beq $a0, $t0, remove_health
 	jr $ra
 # ------------------------------------
 # check double jump	
 jump_check:
 	# player location
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
+	li $a0, 64 	  	#t0 = 64
+	mul $a0, $a0, $s2 	#t0 = 32*y
+	add $a0, $s1, $a0 	#t0 = x + 32*y
 	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
 # check double jump ground
 jump_check_ground:
 	li $t6, GROUND
-    	li $t7, 0
+    	li $t0, 0
 loop_jcg:
-	bge $t7, 64, end_loop_jcg
+	bge $t0, 64, end_loop_jcg
 	li $t5, 4	  	# 4 bytes
-	mul $t5, $t5, $t7 	# offset = 4 bytes * index
+	mul $t5, $t5, $t0 	# offset = 4 bytes * index
 	add $t5, $t5, $t6 	# t5 = address + offset
 	beq $t5, $a0 double_jump_reset
-    	addi $t7, $t7, 1
+    	addi $t0, $t0, 1
     	j loop_jcg
 end_loop_jcg:
 	beq $s7, 1, jump_check_1
@@ -764,14 +764,14 @@ jump_check_3:
 	jal jump_check_patform
 	j jump_checked
 jump_check_patform:
-	li $t7, -2 		# init t7 = 0
+	li $t0, -2 		# init t0 = 0
 loop_jcp:
-	bge $t7, 15, end_loop_jcp
+	bge $t0, 15, end_loop_jcp
 	li $t5, 4	  	# 4 bytes
-	mul $t5, $t5, $t7 	# offset = 4 bytes * index
+	mul $t5, $t5, $t0 	# offset = 4 bytes * index
 	add $t5, $t5, $a1 	# t5 = address + offset
 	beq $t5, $a0 double_jump_reset
-    	addi $t7, $t7, 1
+    	addi $t0, $t0, 1
     	j loop_jcp
 end_loop_jcp:
 	jr $ra
@@ -782,9 +782,9 @@ double_jump_reset:
 # check player at finish line
 finish_check:
 	# player location
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 32*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
+	li $a0, 64 	  	#t0 = 64
+	mul $a0, $a0, $s2 	#t0 = 32*y
+	add $a0, $s1, $a0 	#t0 = x + 32*y
 	addi $a0, $a0, 2308 	# 10 row down + 1 cell right
 	beq $s7, 1, finish_check_1
 	beq $s7, 2, finish_check_2
@@ -858,26 +858,26 @@ platform_checked:
 	beq $t8, 0x64, right   	# ASCII code of 'd' is 0x64
 # check movement type
 check_mtp:
-	li $a0, 64 	  		#t7 = 64
-	mul $a0, $a0, $s2 		#t7 = 32*y
-	add $a0, $s1, $a0 		#t7 = x + 32*y
-	addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
+	li $a0, 64 	  		#t0 = 64
+	mul $a0, $a0, $s2 		#t0 = 32*y
+	add $a0, $s1, $a0 		#t0 = x + 32*y
+	addi $a0, $a0, BASE_ADDRESS 	# t0 = base + offset
 	beq $t8, 0x77, wp_offset   # ASCII code of 'w' is 0x77
 	beq $t8, 0x61, ap_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, sp_offset   # ASCII code of 's' is 0x73 
 	j dp_offset
 # offset for each movement type
 wp_offset:
-	addi $a0, $a0, -244  	#t7 + 8 row below + 5 cell righ
+	addi $a0, $a0, -244  	#t0 + 8 row below + 5 cell righ
 	j horizontal_p_check
 ap_offset:
-	addi $a0, $a0, 1988  	#t7 + 8 row below + 5 cell left
+	addi $a0, $a0, 1988  	#t0 + 8 row below + 5 cell left
 	j vertical_p_check
 dp_offset:
-	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
+	addi $a0, $a0, 2068  	#t0 + 8 row below + 5 cell right
 	j vertical_p_check
 sp_offset:
-	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
+	addi $a0, $a0, 2316  	#t0 + 8 row below + 5 cell righ
 	j horizontal_p_check
 # vertical (y -axis) platform collision check
 vertical_p_check:
@@ -948,23 +948,23 @@ collision_check_3:
 	j platform_check
 #check movement type
 check_mt:
-	li $a0, 64 	  	#t7 = 64
-	mul $a0, $a0, $s2 	#t7 = 64*y
-	add $a0, $s1, $a0 	#t7 = x + 32*y
-	addi $a0, $a0, BASE_ADDRESS 	# t7 = base + offset
+	li $a0, 64 	  	#t0 = 64
+	mul $a0, $a0, $s2 	#t0 = 64*y
+	add $a0, $s1, $a0 	#t0 = x + 32*y
+	addi $a0, $a0, BASE_ADDRESS 	# t0 = base + offset
 	beq $t8, 0x61, a_offset   # ASCII code of 'a' is 0x61
 	beq $t8, 0x73, s_offset   # ASCII code of 's' is 0x7
 	beq $t8, 0x64, d_offset   # ASCII code of 'd' is 0x643 
 	j platform_check
 # set offset for different movement type
 a_offset:
-	addi $a0, $a0, 2028  	#t7 + 8 row below + 5 cell left
+	addi $a0, $a0, 2028  	#t0 + 8 row below + 5 cell left
 	j vertical_check
 d_offset:
-	addi $a0, $a0, 2068  	#t7 + 8 row below + 5 cell right
+	addi $a0, $a0, 2068  	#t0 + 8 row below + 5 cell right
 	j vertical_check
 s_offset:
-	addi $a0, $a0, 2316  	#t7 + 8 row below + 5 cell righ
+	addi $a0, $a0, 2316  	#t0 + 8 row below + 5 cell righ
 	j horizontal_check
 # vertical (y -axis) platform collision check	
 vertical_check:
@@ -998,8 +998,8 @@ end_hc:
 # ------------------------------------
 # end screen wait for player to press p to restart
 end_screen:
-	li $t7, 0xffff0000  
-	lw $t8, 4($t7) # this assumes $t7 is set to 0xfff0000 from before 
+	li $t0, 0xffff0000  
+	lw $t8, 4($t0) # this assumes $t0 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   # ASCII code of 'p' is 0x70
 	beq $t8, 0x78, Exit   # ASCII code of 'p' is 0x78
 	j end_screen
