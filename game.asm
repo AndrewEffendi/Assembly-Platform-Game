@@ -134,8 +134,6 @@ keypress_happened :
 	beq $t8, 0x31, respond_to_1   	# ASCII code of '1' is 0x31
 	beq $t8, 0x32, respond_to_2   	# ASCII code of '2' is 0x32
 	beq $t8, 0x33, respond_to_3   	# ASCII code of '3' is 0x32
-	beq $t8, 0x6b, win_screen   	# ASCII code of 'k' is 0x6b to be remove
-	beq $t8, 0x6c, lose_screen   	# ASCII code of 'l' is 0x6c to be remove
 	j wait
 # ------------------------------------
 # w keypress
@@ -454,6 +452,15 @@ paint_monster:
 	sw $a1, 784($a0)
 	sw $a1, 1024($a0)
 	sw $a1, 1040($a0)
+	beqz $a3, red_eyes
+	jr $ra
+red_eyes:
+	li $t0, COLOR_RED
+	sw $t0, 260($a0)
+	sw $t0, 268($a0)
+	sw $t0, 772($a0)
+	sw $t0, 776($a0)
+	sw $t0, 780($a0)
 	jr $ra
 paint_monster_done:
 	beq $a3, 1, end_r_p_1
@@ -1001,7 +1008,6 @@ end_screen:
 	li $t0, 0xffff0000  
 	lw $t8, 4($t0) 			# this assumes $t0 is set to 0xfff0000 from before 
 	beq $t8, 0x70, respond_to_p   	# ASCII code of 'p' is 0x70
-	beq $t8, 0x78, Exit   		# ASCII code of 'p' is 0x78
 	j end_screen
 # ------------------------------------
 # win end screen 
