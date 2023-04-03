@@ -6,10 +6,10 @@
 # Student: Andrew EFfendi, 1007141594, Effendia, a.effendi@mail.utoronto.ca
 # 
 # Bitmap Display Configuration: 
-# - Unit width in pixels: 8 (update this as needed)  
-# - Unit height in pixels: 8 (update this as needed) 
-# - Display width in pixels: 512 (update this as needed) 
-# - Display height in pixels: 512 (update this as needed) 
+# - Unit width in pixels: 8 
+# - Unit height in pixels: 8
+# - Display width in pixels: 512
+# - Display height in pixels: 512 
 # - Base Address for Display: 0x10008000 ($gp) 
 # 
 # Which milestones have been reached in this submission? 
@@ -24,10 +24,11 @@
 # 6. Double jump [1 mark]
 # 
 # Link to video demonstration for final submission: 
-# - (insert YouTube / MyMedia / other URL here). Make sure we can view it! 
+# - https://play.library.utoronto.ca/watch/abc87be52f016de511732f9e015c2841
 # 
 # Are you OK with us sharing the video with people outside course staff? 
-# - yes / no / yes, and please share this project github link as well! 
+# - yes
+# - https://github.com/AndrewEffendi/Assembly-Platform-Game
 # 
 # Any additional information that the TA needs to know: 
 # - (write here, if any) 
