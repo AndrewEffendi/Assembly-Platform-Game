@@ -2,9 +2,7 @@
 # 
 # CSCB58 Winter 2023 Assembly Final Project 
 # University of Toronto, Scarborough 
-# 
-# Student: Andrew EFfendi, 1007141594, Effendia, a.effendi@mail.utoronto.ca
-# 
+# # 
 # Bitmap Display Configuration: 
 # - Unit width in pixels: 8 
 # - Unit height in pixels: 8
